@@ -334,10 +334,12 @@
 		F154BFAF18EE8F4F0083974A /* UmfPackSupport */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = UmfPackSupport; sourceTree = "<group>"; };
 		F154BFB118EE8F4F0083974A /* renderBezier.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = renderBezier.cpp; sourceTree = "<group>"; };
 		F154BFB218EE8F4F0083974A /* renderBezier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = renderBezier.h; sourceTree = "<group>"; };
-		F154BFB318EE90200083974A /* preHeader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = preHeader.h; sourceTree = "<group>"; };
+		F154BFB318EE90200083974A /* utilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = utilities.h; sourceTree = "<group>"; };
 		F154BFB418EE90200083974A /* utilities.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utilities.cpp; sourceTree = "<group>"; };
 		F154BFB518EE91BD0083974A /* .gitignore */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .gitignore; sourceTree = SOURCE_ROOT; };
 		F154BFB618EE93030083974A /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.md; sourceTree = SOURCE_ROOT; };
+		F154BFB718EE958F0083974A /* BEZParser.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = BEZParser.cpp; sourceTree = "<group>"; };
+		F154BFB818EE958F0083974A /* BEZParser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BEZParser.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -346,6 +348,7 @@
 			children = (
 				F154BFB518EE91BD0083974A /* .gitignore */,
 				F154BE4118EE8C890083974A /* Makefile */,
+				F154BFB618EE93030083974A /* README.md */,
 				F154BE4418EE8F4F0083974A /* build */,
 				F154BE4518EE8F4F0083974A /* libraries */,
 				F154BFB018EE8F4F0083974A /* source */,
@@ -997,10 +1000,11 @@
 		F154BFB018EE8F4F0083974A /* source */ = {
 			isa = PBXGroup;
 			children = (
+				F154BFB718EE958F0083974A /* BEZParser.cpp */,
+				F154BFB818EE958F0083974A /* BEZParser.h */,
 				F154BFB118EE8F4F0083974A /* renderBezier.cpp */,
-				F154BFB618EE93030083974A /* README.md */,
 				F154BFB218EE8F4F0083974A /* renderBezier.h */,
-				F154BFB318EE90200083974A /* preHeader.h */,
+				F154BFB318EE90200083974A /* utilities.h */,
 				F154BFB418EE90200083974A /* utilities.cpp */,
 			);
 			path = source;

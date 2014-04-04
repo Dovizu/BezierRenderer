@@ -10,6 +10,6 @@
 #define __BezierSurfaceRenderer__renderBezier__
 
 #include <iostream>
-#include "preHeader.h"
+#include "utilities.h"
 
 #endif /* defined(__BezierSurfaceRenderer__renderBezier__) */

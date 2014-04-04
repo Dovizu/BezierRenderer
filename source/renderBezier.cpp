@@ -9,5 +9,6 @@
 #include "renderBezier.h"
 
 int main(int argc, char *argv[]) {
+    Color c;
     return 0;
 }
