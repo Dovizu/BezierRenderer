@@ -337,6 +337,7 @@
 		F154BFB318EE90200083974A /* preHeader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = preHeader.h; sourceTree = "<group>"; };
 		F154BFB418EE90200083974A /* utilities.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utilities.cpp; sourceTree = "<group>"; };
 		F154BFB518EE91BD0083974A /* .gitignore */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .gitignore; sourceTree = SOURCE_ROOT; };
+		F154BFB618EE93030083974A /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.md; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -997,6 +998,7 @@
 			isa = PBXGroup;
 			children = (
 				F154BFB118EE8F4F0083974A /* renderBezier.cpp */,
+				F154BFB618EE93030083974A /* README.md */,
 				F154BFB218EE8F4F0083974A /* renderBezier.h */,
 				F154BFB318EE90200083974A /* preHeader.h */,
 				F154BFB418EE90200083974A /* utilities.cpp */,
