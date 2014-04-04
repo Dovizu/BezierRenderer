@@ -8,4 +8,8 @@
 
 #include "BEZParser.h"
 
-Color c;
+BEZParser::BEZParser ()
+{
+    
+}
+

@@ -12,4 +12,12 @@
 #include <iostream>
 #include "utilities.h"
 
+class BEZParser {
+    
+    
+public:
+    BEZParser();
+//    parseDirectory(string dir);
+};
+
 #endif /* defined(__BezierSurfaceRenderer__BEZParser__) */
