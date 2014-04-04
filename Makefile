@@ -5,12 +5,15 @@ LIB = libraries
 
 CIMG = -I$(LIB)/CImg/ -I/opt/X11/include -L/opt/X11/lib -lX11 -I/usr/local/bin/ -lpthread
 EIGEN = -I$(LIB)/Eigen/
-GLFW = -I$(LIB)/GLFW/include -L$(LIB)/GLFW/lib -lglfw3 -framework Cocoa -framework IOKit -framework CoreVideo
+GLFW_COMP = -I$(LIB)/GLFW/include
+GLFW_LINK = -L$(LIB)/GLFW/lib -lglfw3 -framework Cocoa -framework IOKit -framework CoreVideo
+GLEW_COMP = -I$(LIB)/GLEW/include -DGLEW_STATIC
+GLEW_LINK = -L$(LIB)/GLEW/lib -lGLEW
 
 ifeq ($(shell sw_vers 2>/dev/null | grep Mac | awk '{ print $$2}'),Mac)
-    CC = clang++ -std=c++11 -stdlib=libc++ -framework OpenGL -framework GLUT $(GLFW)
-	CFLAGS = -g -c -Wall -Wno-deprecated $(EIGEN)
-	LFLAGS = -Wall
+    CC = clang++ -std=c++11 -stdlib=libc++
+	CFLAGS = -g -c -Wall -Wno-deprecated $(EIGEN) $(GLFW_COMP) $(GLEW_COMP)
+	LFLAGS = -Wall $(GLFW_LINK) $(GLEW_LINK) -framework OpenGL
 else
 
 endif

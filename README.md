@@ -34,9 +34,12 @@ Documentation
 
 ##External Libraries
 - Eigen
-- GLFW
+- GLFW ([Doc](http://www.glfw.org/docs/latest/pages.html))
+- GLEW ([Doc](http://glew.sourceforge.net/install.html))
 - OpenGL
 
-##Main Classes
+##Library Notes
+###GLEW
+When compiling, use `make glew.lib` and DO NOT copy the aliases/shorcuts
 
 ##Support Classes
