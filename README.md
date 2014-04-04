@@ -5,7 +5,7 @@ Project Identity
 - Donny Reynolds
 
 ###Platform
-`OS X` and `Linux`
+`OS X` (With OpenGL 3.2+ Support Only)
 
 ###Source Location
 `./`
@@ -34,6 +34,8 @@ Documentation
 
 ##External Libraries
 - Eigen
+- GLFW
+- OpenGL
 
 ##Main Classes
 
