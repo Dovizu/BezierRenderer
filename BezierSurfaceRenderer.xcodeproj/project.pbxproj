@@ -8,6 +8,8 @@
 
 /* Begin PBXFileReference section */
 		F15261E718EFA6200012EA12 /* UnitTest.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = UnitTest.cpp; sourceTree = "<group>"; };
+		F15261EA18EFB8770012EA12 /* teapot.bez */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = teapot.bez; sourceTree = "<group>"; };
+		F15261EB18EFB8770012EA12 /* test.bez */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = test.bez; sourceTree = "<group>"; };
 		F154BE4118EE8C890083974A /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		F154BE4718EE8F4F0083974A /* Array */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Array; sourceTree = "<group>"; };
 		F154BE4818EE8F4F0083974A /* Cholesky */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Cholesky; sourceTree = "<group>"; };
@@ -344,9 +346,19 @@
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
+		F15261E918EFB8770012EA12 /* bezFiles */ = {
+			isa = PBXGroup;
+			children = (
+				F15261EA18EFB8770012EA12 /* teapot.bez */,
+				F15261EB18EFB8770012EA12 /* test.bez */,
+			);
+			path = bezFiles;
+			sourceTree = "<group>";
+		};
 		F154BE3618EE8C5D0083974A = {
 			isa = PBXGroup;
 			children = (
+				F15261E918EFB8770012EA12 /* bezFiles */,
 				F154BFB518EE91BD0083974A /* .gitignore */,
 				F154BE4118EE8C890083974A /* Makefile */,
 				F154BFB618EE93030083974A /* README.md */,
