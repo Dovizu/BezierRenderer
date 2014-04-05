@@ -19,9 +19,9 @@ else
 endif
 
 PRODUCT = renderBezier
-OBJS = $(BUILD)/renderBezier.o $(BUILD)/BEZParser.o
+OBJS = $(BUILD)/utilities.o $(BUILD)/renderBezier.o $(BUILD)/BEZParser.o
 
-renderBezier: renderBezier.o BEZParser.o
+renderBezier: renderBezier.o BEZParser.o utilities.o
 	$(CC) $(LFLAGS) $(OBJS) -o $(PRODUCT)
 
 renderBezier.o: $(SRC)/renderBezier.cpp
@@ -30,5 +30,8 @@ renderBezier.o: $(SRC)/renderBezier.cpp
 BEZParser.o: $(SRC)/BEZParser.cpp
 	$(CC) $(CFLAGS) $(SRC)/BEZParser.cpp -o $(BUILD)/BEZParser.o
 
+utilities.o: $(SRC)/utilities.cpp
+	$(CC) $(CFLAGS) $(SRC)/utilities.cpp -o $(BUILD)/utilities.o
+
 clean:
-	$(RM) *.o renderBezier build/renderBezier.o
+	$(RM) *.o

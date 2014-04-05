@@ -42,6 +42,12 @@
       <PathRunnable
          FilePath = "/Users/Donny/Dropbox/CS 184/assignments/BezierSurfaceRenderer/renderBezier">
       </PathRunnable>
+      <CommandLineArguments>
+         <CommandLineArgument
+            argument = "--testBEZParser"
+            isEnabled = "YES">
+         </CommandLineArgument>
+      </CommandLineArguments>
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>

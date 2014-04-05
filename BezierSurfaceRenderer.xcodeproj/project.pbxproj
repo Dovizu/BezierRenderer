@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXFileReference section */
+		F15261E718EFA6200012EA12 /* UnitTest.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = UnitTest.cpp; sourceTree = "<group>"; };
 		F154BE4118EE8C890083974A /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		F154BE4718EE8F4F0083974A /* Array */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Array; sourceTree = "<group>"; };
 		F154BE4818EE8F4F0083974A /* Cholesky */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Cholesky; sourceTree = "<group>"; };
@@ -1000,10 +1001,11 @@
 		F154BFB018EE8F4F0083974A /* source */ = {
 			isa = PBXGroup;
 			children = (
-				F154BFB718EE958F0083974A /* BEZParser.cpp */,
-				F154BFB818EE958F0083974A /* BEZParser.h */,
-				F154BFB118EE8F4F0083974A /* renderBezier.cpp */,
 				F154BFB218EE8F4F0083974A /* renderBezier.h */,
+				F154BFB118EE8F4F0083974A /* renderBezier.cpp */,
+				F154BFB818EE958F0083974A /* BEZParser.h */,
+				F154BFB718EE958F0083974A /* BEZParser.cpp */,
+				F15261E718EFA6200012EA12 /* UnitTest.cpp */,
 				F154BFB318EE90200083974A /* utilities.h */,
 				F154BFB418EE90200083974A /* utilities.cpp */,
 			);
@@ -1162,6 +1164,7 @@
 				F154BE4018EE8C5D0083974A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

@@ -2,21 +2,11 @@
 #define DVZUtil_H
 #include "utilities.h"
 
-flag_testing = false;
 
 #pragma mark - Data Structures
 
-typedef struct {
-    string optName;
-    int numOfArgs;
-    vector<string> *args;
-} CmdLineOptResult;
-bool verbose = false;
 
-typedef struct {
-    Point min;
-    Point max;
-} BoundingBox;
+bool verbose = false;
 
 #pragma mark - Math
 float sqr(float x) { return x*x;}

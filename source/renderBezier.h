@@ -9,7 +9,6 @@
 #ifndef __BezierSurfaceRenderer__renderBezier__
 #define __BezierSurfaceRenderer__renderBezier__
 
-#include <iostream>
 #include "utilities.h"
 
 #endif /* defined(__BezierSurfaceRenderer__renderBezier__) */

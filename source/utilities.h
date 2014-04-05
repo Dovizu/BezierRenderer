@@ -1,6 +1,16 @@
 #ifndef preHeader_h
 #define preHeader_h
 
+#include <stdlib.h>
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <cstdlib>
+#include <vector>
+#include <map>
+#include <algorithm>
+#include "float.h"
+#include <dirent.h>
 
 #ifdef __APPLE__
 //#include <OpenGL/gl.h> (Included by glew.h)
@@ -18,16 +28,8 @@
 #include <GL/glew.h>
 #endif
 
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <cstdlib>
-#include <vector>
-#include <algorithm>
-#include "float.h"
-
 #include <Eigen> //Eigen needs to go before CImg because X11 re-defines "Success" macro
-#include <dirent.h>
+
 
 using namespace std;
 using namespace Eigen;
@@ -45,8 +47,6 @@ exit(EXIT_FAILURE); \
 #   define ASSERT(condition, message) do { } while (false)
 #endif
 
-
-extern bool flag_testing;
 #define nl << endl
 
 #pragma mark - typedefs and enums
@@ -63,13 +63,22 @@ typedef Transform<float, 3, Affine> Transform3fAffine;
 typedef Transform<float, 3, Projective> Transform3fProjective;
 #define IdentityTransform() Transform<float, 3, Affine>(UniformScaling<float>(1.0))
 
+
 typedef enum {
     LightSourceDirectional,
     LightSourcePoint
 } LightSourceType;
 
-struct CmdLineOptResult;
-struct BoundingBox;
+
+struct CmdLineOptResult {
+    string optName;
+    int numOfArgs;
+    vector<string> *args;
+};
+struct BoundingBox{
+    Point min;
+    Point max;
+};
 
 #pragma mark - Math
 
