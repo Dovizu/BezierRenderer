@@ -21,14 +21,18 @@ class BEZParser {
     TessellationScheme scheme = Uniform;
     uint32_t divs = 16;
     float error = 0.5;
+    
 public:
     BEZParser();
     void setScheme(TessellationScheme s);
     void setErrorRate(float e);
     void setDivDepth(uint32_t d);
-    void parseDirectory(string dir, float **indices, uint32_t **vertices);
-    void getFileNamesOfDirectory(const string& basePath, vector<string>& filenames, paramMap& pMap);
+    void parseDirectory(string dir,
+                        size_t *numberOfPatches,
+                        Vector* *controlPoints);  //ptr to array
+    
 private:
+    void getFileNamesOfDirectory(const string& basePath, vector<string>& filenames, paramMap& pMap);
     
 };
 

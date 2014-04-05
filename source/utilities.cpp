@@ -9,7 +9,7 @@
 bool verbose = false;
 
 #pragma mark - Math
-float sqr(float x) { return x*x;}
+inline float sqr(float x) { return x*x;}
 
 Vector makeVec(Point start, Point end) {
     return (end-start).matrix();
@@ -24,6 +24,31 @@ float maxf(float num1, float num2) {return max<float>(num1, num2);}
 string fileNameWithoutExt(const string& fileName) {
     size_t position = fileName.find(".");
     return (string::npos == position)? fileName : fileName.substr(0, position);
+}
+bool isNewLine(const char* str) {
+    bool windowsNewLine = strcmp(str, "\r\n")==0;
+    bool unixNewLine = strcmp(str, "\n")==0;
+    bool classicOSXNewLine = strcmp(str, "\r")==0;
+    return windowsNewLine || unixNewLine || classicOSXNewLine;
+}
+string stripNewLine(string dirty) {
+    size_t pos = 0;
+    if ((pos=dirty.find("\r"))!=string::npos) {
+        return dirty.erase(pos, 2);
+    }
+    if ((pos=dirty.find("\r\n"))!=string::npos) {
+        return dirty.erase(pos, 4);
+    }
+    if ((pos=dirty.find("\n"))!=string::npos) {
+        return dirty.erase(pos, 2);
+    }
+    return dirty;
+}
+bool isInteger(const string & s) {
+    if(s.empty() || ((!isdigit(s[0])) && (s[0] != '-') && (s[0] != '+'))) return false ;
+    char * p ;
+    strtol(s.c_str(), &p, 10) ;
+    return (*p == 0) ;
 }
 
 void println(string str){

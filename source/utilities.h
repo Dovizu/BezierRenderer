@@ -34,7 +34,7 @@
 using namespace std;
 using namespace Eigen;
 
-#ifndef DNDEBUG
+#ifdef DEBUG
 #   define ASSERT(condition, message) \
 do { \
 if (! (condition)) { \
@@ -84,13 +84,17 @@ struct BoundingBox{
 
 float sqr(float x);
 Vector makeVec(Point start, Point end);
+bool isInteger(const string & s);
+float minf(float num1, float num2);
+float maxf(float num1, float num2);
 
 #pragma mark - Utilities
 
-float minf(float num1, float num2);
-float maxf(float num1, float num2);
 string fileNameWithoutExt(const string& fileName);
 void println(string str);
+bool isNewLine(const char* str);
+string stripNewLine(string dirty);
+
 
 /**
  *  Parses command line options specified in "options"

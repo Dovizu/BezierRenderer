@@ -13,9 +13,15 @@
 
 void testBEZParser() {
     BEZParser parser;
-    vector<string> filenames;
-    paramMap map;
-    parser.getFileNamesOfDirectory(string("bezFiles/"), filenames, map);
+    size_t numberOfPatches;
+    Vector* controlPoints;
+    string basePath = "bezFiles/";
+    parser.parseDirectory(basePath,
+                          &numberOfPatches,
+                          &controlPoints);
+    for (int i=0; i<numberOfPatches*16; i++) {
+        printf("%f %f %f\n", controlPoints[i](0), controlPoints[i](1), controlPoints[i](2));
+    }
 }
 
 void testOpenGL() {
