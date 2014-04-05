@@ -8,24 +8,11 @@
 
 #include "BEZParser.h"
 
-BEZParser::BEZParser ()
-{
-}
+BEZParser::BEZParser () {}
 
-//void BEZParser::setScheme(TessellationScheme s) {
-//    scheme = s;
-//}
-//void BEZParser::setErrorRate(float e) {
-//    error = e;
-//}
-//void BEZParser::setDivDepth(uint32_t d) {
-//    divs = d;
-//}
-
-void BEZParser::getFileNamesOfDirectory
-(const string& basePath,
- vector<string>& filenames,
- paramMap& pMap)
+void BEZParser::getFileNamesOfDirectory(const string& basePath,
+                                        vector<string>& filenames,
+                                        paramMap& pMap)
 {
     dirent *de;
     DIR *dirp = opendir(basePath.c_str());
@@ -47,8 +34,7 @@ void BEZParser::getFileNamesOfDirectory
     }
 }
 
-void BEZParser::parseDirectory(string dir, vector<BezierObject>& objects)  //ptr to array
-{
+void BEZParser::parseDirectory(string dir, vector<BezierObject>& objects) {
     ASSERT(dir.back()=='/', "Directory name incorrect, expected: dirname/");
     const int MAX_CHARS_PER_LINE = 100;
     const int MAX_TOKENS_PER_LINE = 100;
@@ -95,13 +81,11 @@ void BEZParser::parseDirectory(string dir, vector<BezierObject>& objects)  //ptr
                     controlPoints = new Vector[patchNum*16];
                     continue; //this line should only contain one number
                 }
-                
                 if (isNewLine(token[0])) {
                     ++currPatch;
                     currGroup = 0;
                     continue;
                 }
-                
                 if (currPatch < patchNum) {
                     ASSERT(token[0]!=NULL && token[11]!=NULL,
                            "Incorrectly formatted bez file, each line should contain 12 numbers, 3 dims for each of the 4 control points");
@@ -126,10 +110,8 @@ void BEZParser::parseDirectory(string dir, vector<BezierObject>& objects)  //ptr
                     
                     currGroup++; //next four
                 }
-                
             }
         }
-        
         BezierObject newBezier;
         newBezier.numberOfPatches = numberOfPatches;
         newBezier.controlPoints = controlPoints;

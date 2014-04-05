@@ -45,6 +45,10 @@
       <CommandLineArguments>
          <CommandLineArgument
             argument = "--testBEZParser"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "--testUniform"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>

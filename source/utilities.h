@@ -63,12 +63,10 @@ typedef Transform<float, 3, Affine> Transform3fAffine;
 typedef Transform<float, 3, Projective> Transform3fProjective;
 #define IdentityTransform() Transform<float, 3, Affine>(UniformScaling<float>(1.0))
 
-
 typedef enum {
     LightSourceDirectional,
     LightSourcePoint
 } LightSourceType;
-
 
 struct CmdLineOptResult {
     string optName;

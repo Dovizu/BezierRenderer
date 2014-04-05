@@ -20,9 +20,9 @@ else
 endif
 
 PRODUCT = renderBezier
-OBJS = $(BUILD)/utilities.o $(BUILD)/renderBezier.o $(BUILD)/BEZParser.o $(BUILD)/UniformTessellation.o
+OBJS = $(BUILD)/utilities.o $(BUILD)/renderBezier.o $(BUILD)/BEZParser.o $(BUILD)/UniformTessellation.o $(BUILD)/Tessellation.o
 
-renderBezier: renderBezier.o BEZParser.o utilities.o UniformTessellation.o
+renderBezier: renderBezier.o BEZParser.o utilities.o UniformTessellation.o Tessellation.o
 	$(CC) $(LFLAGS) $(OBJS) -o $(PRODUCT)
 
 renderBezier.o: $(SRC)/renderBezier.cpp
@@ -36,6 +36,9 @@ utilities.o: $(SRC)/utilities.cpp
     
 UniformTessellation.o: $(SRC)/UniformTessellation.cpp
 	$(CC) $(CFLAGS) $(SRC)/UniformTessellation.cpp -o $(BUILD)/UniformTessellation.o
+    
+Tessellation.o: $(SRC)/Tessellation.cpp
+	$(CC) $(CFLAGS) $(SRC)/Tessellation.cpp -o $(BUILD)/Tessellation.o
 
 clean:
 	$(RM) $(BUILD)/*.o $(PRODUCT)

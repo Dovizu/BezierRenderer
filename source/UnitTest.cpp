@@ -12,6 +12,16 @@
 #include "BEZParser.h"
 #include "UniformTessellation.h"
 
+void testUniform() {
+    BEZParser parser;
+    vector<BezierObject> objects;
+    string basePath = "bezFiles/";
+    parser.parseDirectory(basePath, objects);
+    UniformTessellation uniform;
+    vector<Mesh> meshes;
+    uniform.tessellate(objects, meshes);
+}
+
 void testBEZParser() {
     BEZParser parser;
     vector<BezierObject> objects;

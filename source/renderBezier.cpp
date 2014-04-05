@@ -13,7 +13,8 @@ int main(int argc, char *argv[]) {
     vector<CmdLineOptResult> *results;
     string basePath;
     string options = "--testOpenGL(0)"; //test OpenGL, GLEW, and GLFW
-    options.append("--testBEZParser(0)");
+    options.append("--testBEZParser(0)"); //test BEZParser for files at "bezFiles/"
+    options.append("--testUniform(0)"); //test UniformTessellation
     
     getCmdLineOptions(argc, argv, options, &results);
     for (auto & result : *results) {
@@ -22,6 +23,9 @@ int main(int argc, char *argv[]) {
         }
         if (result.optName.compare("--testBEZParser")==0) {
             testBEZParser();
+        }
+        if (result.optName.compare("--testUniform")==0) {
+            testUniform();
         }
     }
     
