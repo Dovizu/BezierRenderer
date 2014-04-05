@@ -12,7 +12,7 @@ UniformTessellation::UniformTessellation() {}
 
 void UniformTessellation::tessellate(vector<BezierObject>& bezierObjects, vector<Mesh>& meshes) {
     for (auto & object : bezierObjects) {
-//        int biggestIndex = 0;
+        //int biggestIndex = 0;
         size_t numberOfVertices = 0;
         size_t numberOfIndicies = 0;
         size_t numVerticesPerPatch = (divs+1)*(divs+1);
@@ -46,27 +46,28 @@ void UniformTessellation::tessellate(vector<BezierObject>& bezierObjects, vector
                     indices[k+3] = p + (divs+1)*(j+0) + (i+1); //left top
                     ++k;
                     numberOfIndicies+=4;
-//                    if (indices[k+0] > biggestIndex) {
-//                        biggestIndex = indices[k+0];
-//                    }
-//                    if (indices[k+1] > biggestIndex) {
-//                        biggestIndex = indices[k+1];
-//                    }
-//                    if (indices[k+2] > biggestIndex) {
-//                        biggestIndex = indices[k+2];
-//                    }
-//                    if (indices[k+3] > biggestIndex) {
-//                        biggestIndex = indices[k+3];
-//                    }
+                    /*
+                    if (indices[k+0] > biggestIndex) {
+                        biggestIndex = indices[k+0];
+                    }
+                    if (indices[k+1] > biggestIndex) {
+                        biggestIndex = indices[k+1];
+                    }
+                    if (indices[k+2] > biggestIndex) {
+                        biggestIndex = indices[k+2];
+                    }
+                    if (indices[k+3] > biggestIndex) {
+                        biggestIndex = indices[k+3];
+                    }
+                     */
                 }
             }
         }
         Mesh mesh = {numberOfVertices, numberOfIndicies, vertices, indices};
         meshes.push_back(mesh);
-//        printf("Biggest Index: %d\n", biggestIndex);
+        //printf("Biggest Index: %d\n", biggestIndex);
     }
 }
-
 
 Vector UniformTessellation::evaluateBezierCurve(const Vector *ctrPts, const float &t) {
     float b0 = (1 - t) * (1 - t) * (1 - t);

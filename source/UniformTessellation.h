@@ -12,12 +12,19 @@
 #include "utilities.h"
 #include "Tessellation.h"
 
-//typedef struct {
-//    size_t numOfVertices;
-//    size_t numOfIndices;
-//    Vector *vertices;
-//    int *indices;
-//} Mesh;
+/* Reference:
+ typedef struct {
+    size_t numOfVertices;
+    size_t numOfIndices;
+    Vector *vertices;
+    int *indices;
+ } Mesh;
+
+ typedef struct {
+    size_t numberOfPatches;
+    Vector *controlPoints;
+ } BezierObject;
+ */
 
 class UniformTessellation : public Tessellation{
     

@@ -45,6 +45,9 @@ When compiling, use `make glew.lib` and DO NOT copy the aliases/shorcuts
 
 ##Main Classes
 ###BEZParser
-
+Parses BEZ files containing patch data
+###Tessellation
+####UniformTessellation
+####AdaptiveTessellation
 
 ##Support Classes
