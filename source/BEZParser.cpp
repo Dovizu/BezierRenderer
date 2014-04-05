@@ -47,9 +47,7 @@ void BEZParser::getFileNamesOfDirectory
     }
 }
 
-void BEZParser::parseDirectory(string dir,
-                    size_t *numberOfPatches,
-                    Vector* *controlPoints)  //ptr to array
+void BEZParser::parseDirectory(string dir, vector<BezierObject>& objects)  //ptr to array
 {
     ASSERT(dir.back()=='/', "Directory name incorrect, expected: dirname/");
     const int MAX_CHARS_PER_LINE = 100;
@@ -61,11 +59,16 @@ void BEZParser::parseDirectory(string dir,
     getFileNamesOfDirectory(dir, filenames, pMap);
     
     for (auto& filename : filenames) {
+        size_t numberOfPatches;
+        Vector *controlPoints;
+        
         size_t patchNum = 0;
         size_t currPatch = 0;
         size_t currGroup = 0;
+        
         ifstream fin;
         fin.open(filename); // open a file
+        
         while (!fin.eof()) {
             // read an entire line into memory
             char buf[MAX_CHARS_PER_LINE];
@@ -88,8 +91,8 @@ void BEZParser::parseDirectory(string dir,
                     ASSERT(token[1]==NULL, "Incorrectly formatted bez file, first line is not integer: number of patches");
                     string firstToken = stripNewLine(token[0]);
                     patchNum = intFromString(firstToken);
-                    *numberOfPatches = patchNum;
-                    *controlPoints = new Vector[patchNum*16];
+                    numberOfPatches = patchNum;
+                    controlPoints = new Vector[patchNum*16];
                     continue; //this line should only contain one number
                 }
                 
@@ -116,15 +119,20 @@ void BEZParser::parseDirectory(string dir,
                     float y4 = floatFromString(string(token[10]));
                     float z4 = floatFromString(stripNewLine(string(token[11])));
                     
-                    (*controlPoints)[currPatch*16+currGroup*4+0] = Vector(x1, y1, z1);
-                    (*controlPoints)[currPatch*16+currGroup*4+1] = Vector(x2, y2, z2);
-                    (*controlPoints)[currPatch*16+currGroup*4+2] = Vector(x3, y3, z3);
-                    (*controlPoints)[currPatch*16+currGroup*4+3] = Vector(x4, y4, z4);
+                    (controlPoints)[currPatch*16+currGroup*4+0] = Vector(x1, y1, z1);
+                    (controlPoints)[currPatch*16+currGroup*4+1] = Vector(x2, y2, z2);
+                    (controlPoints)[currPatch*16+currGroup*4+2] = Vector(x3, y3, z3);
+                    (controlPoints)[currPatch*16+currGroup*4+3] = Vector(x4, y4, z4);
                     
                     currGroup++; //next four
                 }
                 
             }
         }
+        
+        BezierObject newBezier;
+        newBezier.numberOfPatches = numberOfPatches;
+        newBezier.controlPoints = controlPoints;
+        objects.push_back(newBezier);
     }
 }

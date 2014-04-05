@@ -13,14 +13,22 @@
 
 void testBEZParser() {
     BEZParser parser;
-    size_t numberOfPatches;
-    Vector* controlPoints;
+    vector<BezierObject> objects;
     string basePath = "bezFiles/";
     parser.parseDirectory(basePath,
-                          &numberOfPatches,
-                          &controlPoints);
-    for (int i=0; i<numberOfPatches*16; i++) {
-        printf("%f %f %f\n", controlPoints[i](0), controlPoints[i](1), controlPoints[i](2));
+                          objects);
+    for (auto& object : objects) {
+        printf("\n\nObject has %d patches\n", int(object.numberOfPatches));
+        Vector *controlPoints = object.controlPoints;
+        for (int i=0; i < object.numberOfPatches*16; i++) {
+            if (i%16==0) {
+                printf("\n===Patch %d===\n", i/16+1);
+            }
+            if (i%4==0) {
+                printf("\t\t\t\t\tLine %d\n", i/4+1);
+            }
+            printf("%f %f %f\n", controlPoints[i](0),controlPoints[i](1),controlPoints[i](2));
+        }
     }
 }
 

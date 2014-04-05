@@ -17,6 +17,11 @@ typedef enum {
     Adaptive,
 } TessellationScheme;
 
+typedef struct {
+    size_t numberOfPatches;
+    Vector *controlPoints;
+} BezierObject;
+
 class BEZParser {
     TessellationScheme scheme = Uniform;
     uint32_t divs = 16;
@@ -30,6 +35,7 @@ public:
     void parseDirectory(string dir,
                         size_t *numberOfPatches,
                         Vector* *controlPoints);  //ptr to array
+    void parseDirectory(string dir, vector<BezierObject>& objects);
     
 private:
     void getFileNamesOfDirectory(const string& basePath, vector<string>& filenames, paramMap& pMap);
