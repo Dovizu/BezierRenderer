@@ -10,6 +10,7 @@
 
 #include "utilities.h"
 #include "BEZParser.h"
+#include "UniformTessellation.h"
 
 void testBEZParser() {
     BEZParser parser;

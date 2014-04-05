@@ -12,15 +12,15 @@ BEZParser::BEZParser ()
 {
 }
 
-void BEZParser::setScheme(TessellationScheme s) {
-    scheme = s;
-}
-void BEZParser::setErrorRate(float e) {
-    error = e;
-}
-void BEZParser::setDivDepth(uint32_t d) {
-    divs = d;
-}
+//void BEZParser::setScheme(TessellationScheme s) {
+//    scheme = s;
+//}
+//void BEZParser::setErrorRate(float e) {
+//    error = e;
+//}
+//void BEZParser::setDivDepth(uint32_t d) {
+//    divs = d;
+//}
 
 void BEZParser::getFileNamesOfDirectory
 (const string& basePath,

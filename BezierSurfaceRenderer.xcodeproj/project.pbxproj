@@ -343,6 +343,8 @@
 		F154BFB618EE93030083974A /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.md; sourceTree = SOURCE_ROOT; };
 		F154BFB718EE958F0083974A /* BEZParser.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = BEZParser.cpp; sourceTree = "<group>"; };
 		F154BFB818EE958F0083974A /* BEZParser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BEZParser.h; sourceTree = "<group>"; };
+		F196DF9118EFE88F00DB8DD2 /* UniformTessellation.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = UniformTessellation.cpp; sourceTree = "<group>"; };
+		F196DF9218EFE88F00DB8DD2 /* UniformTessellation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UniformTessellation.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -1015,6 +1017,8 @@
 			children = (
 				F154BFB218EE8F4F0083974A /* renderBezier.h */,
 				F154BFB118EE8F4F0083974A /* renderBezier.cpp */,
+				F196DF9218EFE88F00DB8DD2 /* UniformTessellation.h */,
+				F196DF9118EFE88F00DB8DD2 /* UniformTessellation.cpp */,
 				F154BFB818EE958F0083974A /* BEZParser.h */,
 				F154BFB718EE958F0083974A /* BEZParser.cpp */,
 				F15261E718EFA6200012EA12 /* UnitTest.cpp */,

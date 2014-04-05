@@ -14,7 +14,7 @@ Project Identity
 First Last
 
 ###Compile Instruction
-"make"
+`make`
 
 Directory Structure
 =====================
@@ -24,6 +24,7 @@ Directory Structure
 - `Makefile`
 - `.gitignore`
 - `BezierSurfaceRenderer.xcodeproj`: XCode project settings
+- `bezFiles/`: default bez files for testing
 
 Usage
 =====================
@@ -41,5 +42,9 @@ Documentation
 ##Library Notes
 ###GLEW
 When compiling, use `make glew.lib` and DO NOT copy the aliases/shorcuts
+
+##Main Classes
+###BEZParser
+
 
 ##Support Classes
