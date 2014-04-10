@@ -22,6 +22,7 @@ class BEZParser {
 public:
     BEZParser();
     void parseDirectory(string dir, vector<BezierObject>& objects);
+    void parseFile(string filename, vector<BezierObject>& objects);
     
 private:
     void getFileNamesOfDirectory(const string& basePath, vector<string>& filenames, paramMap& pMap);
