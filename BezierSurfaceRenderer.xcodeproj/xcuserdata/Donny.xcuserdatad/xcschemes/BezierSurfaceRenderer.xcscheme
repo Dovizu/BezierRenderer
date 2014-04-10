@@ -49,7 +49,7 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "-f test.bez 0.2"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--testUniform"

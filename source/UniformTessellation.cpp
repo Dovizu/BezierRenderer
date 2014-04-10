@@ -36,15 +36,15 @@ void UniformTessellation::tessellate(vector<BezierObject>& bezierObjects, vector
             }
             //connect faces by linking indices to vertices
             k = currPatch*numIndiciesPerPatch;
+            int p = currPatch*numVerticesPerPatch;
             for (int j=0; j<divs; ++j) {
                 for (int i=0; i<divs; ++i) {
-                    int p = currPatch*numVerticesPerPatch;
                     //visualization: j axis horizontal, i axis vertical
                     indices[k+0] = p + (divs+1)*(j+0) + (i+0); //left bottom
                     indices[k+1] = p + (divs+1)*(j+1) + (i+0); //right bottom
                     indices[k+2] = p + (divs+1)*(j+1) + (i+1); //right top
                     indices[k+3] = p + (divs+1)*(j+0) + (i+1); //left top
-                    ++k;
+                    k += 4;
                     numberOfIndicies+=4;
                     /*
                     if (indices[k+0] > biggestIndex) {

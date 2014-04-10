@@ -20,6 +20,10 @@ void testUniform() {
     UniformTessellation uniform;
     vector<Mesh> meshes;
     uniform.tessellate(objects, meshes);
+    Mesh mesh = meshes.at(0);
+//    for (int i=0; i<mesh.numOfIndices; i++) {
+//        printf("Index: %d\n", mesh.indices[i]);
+//    }
 }
 
 void testBEZParser() {
