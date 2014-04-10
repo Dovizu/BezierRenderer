@@ -13,6 +13,16 @@
 #include "UniformTessellation.h"
 #include "AdaptiveTessellation.h"
 
+typedef struct {
+    size_t numOfIndices;
+    size_t numOfVertices;
+    float *vertices;
+    int *indices;
+} RasterMesh;
+
+void rasterizeMeshes(vector<Mesh>& meshes, vector<RasterMesh>& rasters);
+void renderToOpenGL(vector<RasterMesh> meshes);
+
 int main(int argc, char *argv[]) {
     vector<CmdLineOptResult> *results;
     string basePath;
@@ -56,16 +66,16 @@ int main(int argc, char *argv[]) {
     
     //Render
     if ((!directoryName.empty() || !fileName.empty()) && param > 0.0) {
-        BEZParser *parser = new BEZParser();
-        Tessellation *tessellator;
+        unique_ptr<BEZParser> parser(new BEZParser());
+        unique_ptr<Tessellation> tessellator;
         vector<BezierObject> objects;
         vector<Mesh> meshes;
         
         if (adaptive) {
-            tessellator = new AdaptiveTessellation();
+            tessellator = unique_ptr<Tessellation>(new AdaptiveTessellation());
             tessellator->setErrorRate(param);
         } else {
-            tessellator = new UniformTessellation();
+            tessellator = unique_ptr<Tessellation>(new UniformTessellation());
             tessellator->setDivDepth((int)(1/param));
         }
         if (!directoryName.empty()) {
@@ -76,7 +86,208 @@ int main(int argc, char *argv[]) {
         }
         tessellator->tessellate(objects, meshes);
         //render mesh openGL
+        vector<RasterMesh> rasterMeshes;
+        rasterizeMeshes(meshes, rasterMeshes);
+        renderToOpenGL(rasterMeshes);
+    }
+    return 0;
+}
+
+
+void rasterizeMeshes(vector<Mesh>& meshes, vector<RasterMesh>& rasters) {
+    for (auto & mesh : meshes) {
+        RasterMesh raster;
+        float *newVertices = new float[mesh.numOfVertices*3];
+        for (int vertex=0; vertex < mesh.numOfVertices; vertex++) {
+            newVertices[vertex*3+0] = mesh.vertices[vertex](0);
+            newVertices[vertex*3+1] = mesh.vertices[vertex](1);
+            newVertices[vertex*3+2] = mesh.vertices[vertex](2);
+        }
+        delete mesh.vertices;
+        raster.vertices = newVertices;
+        raster.numOfVertices = mesh.numOfVertices*3;
+        raster.indices = mesh.indices;
+        raster.numOfIndices = mesh.numOfIndices;
+        rasters.push_back(raster);
+    }
+}
+
+/*
+ Reference:
+ typedef struct {
+ size_t numOfVertices;
+ size_t numOfIndices;
+ Vector *vertices;
+ int *indices;
+ } Mesh;
+ */
+void renderToOpenGL(vector<RasterMesh> meshes) {
+    // Shader sources
+    const GLchar* vertexSource =
+    "#version 150 core\n"
+    "in vec3 position;"
+    "in vec3 color;"
+    "out vec3 Color;"
+    "uniform mat4 trans;"
+    "void main() {"
+    "   Color = color;"
+    "   gl_Position = trans * vec4(position, 1.0);"
+    "}";
+    const GLchar* fragmentSource =
+    "#version 150 core\n"
+    "uniform vec3 Color;"
+    "out vec4 outColor;"
+    "void main() {"
+    "   outColor = vec4(Color, 1.0);"
+    "}";
+    
+    if (!glfwInit()) {
+        cerr << "GLFW cannot initialize" << endl;
+        return;
+    }
+    //Only version 3.2 and up
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_RESIZABLE, GL_FALSE); //No resize
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); //Important, otherwise "glfCreateWindow" will return NULL
+    GLFWwindow* window = glfwCreateWindow(800, 600, "BezierShader", nullptr, nullptr); // Windowed
+    //GLFWwindow* window = glfwCreateWindow(800, 600, "OpenGL", glfwGetPrimaryMonitor(), nullptr); // Fullscreen
+    if (!window) {
+        cerr << "GLFW cannot create window" << endl;
+        glfwTerminate();
+        return;
+    }
+    glfwMakeContextCurrent(window);
+    
+    glewExperimental = GL_TRUE;
+    if (glewInit() != GLEW_OK) {
+        cerr << "GLEW cannot initialize" << endl;
+        return;
     }
     
-    return 0;
+    // Create and compile the vertex shader
+    GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertexShader, 1, &vertexSource, NULL);
+    glCompileShader(vertexShader);
+    
+    // Create and compile the fragment shader
+    GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragmentShader, 1, &fragmentSource, NULL);
+    glCompileShader(fragmentShader);
+    
+    // Link the vertex and fragment shader into a shader program
+    GLuint shaderProgram = glCreateProgram();
+    glAttachShader(shaderProgram, vertexShader);
+    glAttachShader(shaderProgram, fragmentShader);
+    glBindFragDataLocation(shaderProgram, 0, "outColor");
+    glLinkProgram(shaderProgram);
+    glUseProgram(shaderProgram);
+    
+    // Uniform Transformation
+    Transform3fAffine trans(Translation3f(0,1,-3.5));
+    trans = trans*Transform3fAffine(AngleAxisf(0.25*M_PI, Vector3f::UnitX()));
+    GLint uniColor = glGetUniformLocation(shaderProgram, "Color");
+    glUniform3f(uniColor, 0.5f, 0.5f, 0.5f);
+    GLint uniTrans = glGetUniformLocation(shaderProgram, "trans");
+    glUniformMatrix4fv(uniTrans, 1, GL_FALSE, trans.matrix().data());
+    
+    RasterMesh mesh = meshes.at(0);
+    /* Create 3D Buffer */
+    
+    // Create Vertex Array Object
+    GLuint vao;
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
+    
+    // Create a Vertex Buffer Object and copy the vertex data to it
+    GLuint vbo;
+    glGenBuffers(1, &vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, mesh.numOfVertices*sizeof(float), mesh.vertices, GL_STATIC_DRAW);
+    
+    // Create an element array
+    GLuint ebo;
+    glGenBuffers(1, &ebo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.numOfIndices*sizeof(int), mesh.indices, GL_STATIC_DRAW);
+    
+    // Specify the layout of the vertex data
+    GLint posAttrib = glGetAttribLocation(shaderProgram, "position");
+    glEnableVertexAttribArray(posAttrib);
+    glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    
+    while(!glfwWindowShouldClose(window))
+    {
+        //render here
+        // Clear the screen to black
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+        
+        // Draw a rectangle from the 2 triangles using 6 indices
+        glDrawElements(GL_TRIANGLES, mesh.numOfIndices, GL_UNSIGNED_INT, 0);
+        
+        glfwSwapBuffers(window);
+        
+        //poll and process events
+        glfwPollEvents();
+        
+        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+            glfwSetWindowShouldClose(window, GL_TRUE);
+        
+        if (glfwGetKey(window, GLFW_KEY_LEFT)) {
+            if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT)) {
+                trans = Transform3fAffine(Translation3f(-0.01,0,0))*trans;
+            }else{
+                trans = Transform3fAffine(AngleAxisf(-M_PI/128,Vector3f::UnitY()))*trans;
+            }
+            glUniformMatrix4fv(uniTrans, 1, GL_FALSE, trans.matrix().data());
+        }
+        if (glfwGetKey(window, GLFW_KEY_RIGHT)) {
+            if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT)) {
+                trans = Transform3fAffine(Translation3f(0.01,0,0))*trans;
+            }else{
+                trans = Transform3fAffine(AngleAxisf(M_PI/128,Vector3f::UnitY()))*trans;
+            }
+            glUniformMatrix4fv(uniTrans, 1, GL_FALSE, trans.matrix().data());
+        }
+        if (glfwGetKey(window, GLFW_KEY_UP)) {
+            if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT)) {
+                trans = Transform3fAffine(Translation3f(0,0.01,0))*trans;
+            }else{
+                trans = Transform3fAffine(AngleAxisf(-M_PI/128,Vector3f::UnitX()))*trans;
+            }
+            glUniformMatrix4fv(uniTrans, 1, GL_FALSE, trans.matrix().data());
+        }
+        if (glfwGetKey(window, GLFW_KEY_DOWN)) {
+            if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT)) {
+                trans = Transform3fAffine(Translation3f(0,-0.01,0))*trans;
+            }else{
+                trans = Transform3fAffine(AngleAxisf(M_PI/128,Vector3f::UnitX()))*trans;
+            }
+            glUniformMatrix4fv(uniTrans, 1, GL_FALSE, trans.matrix().data());
+        }
+        if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT)) {
+            if (glfwGetKey(window, GLFW_KEY_EQUAL)) {
+                trans = Transform3fAffine(Scaling3f(1.01,1.01,1.01))*trans;
+                glUniformMatrix4fv(uniTrans, 1, GL_FALSE, trans.matrix().data());
+            }else if (glfwGetKey(window, GLFW_KEY_MINUS)) {
+                trans = Transform3fAffine(Scaling3f(0.99,0.99,0.99))*trans;
+                glUniformMatrix4fv(uniTrans, 1, GL_FALSE, trans.matrix().data());
+            }
+        }
+    }
+    
+    glDeleteProgram(shaderProgram);
+    glDeleteShader(fragmentShader);
+    glDeleteShader(vertexShader);
+    
+    glDeleteBuffers(1, &ebo);
+    glDeleteBuffers(1, &vbo);
+    
+    glDeleteVertexArrays(1, &vao);
+    
+    printf("OpenGL version supported by this platform (%s): \n", glGetString(GL_VERSION));
+    
+    glfwTerminate();
 }

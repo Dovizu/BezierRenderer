@@ -48,8 +48,8 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "-f test.bez 0.2"
-            isEnabled = "NO">
+            argument = "-d bezFiles/ 0.2"
+            isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--testUniform"

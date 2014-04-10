@@ -16,7 +16,7 @@ void UniformTessellation::tessellate(vector<BezierObject>& bezierObjects, vector
         size_t numberOfVertices = 0;
         size_t numberOfIndicies = 0;
         size_t numVerticesPerPatch = (divs+1)*(divs+1);
-        size_t numIndiciesPerPatch = divs*divs*4;
+        size_t numIndiciesPerPatch = divs*divs*6;
         //total list of vertices
         Vector *vertices = new Vector[numVerticesPerPatch * object.numberOfPatches];
         //total list of indices
@@ -40,12 +40,16 @@ void UniformTessellation::tessellate(vector<BezierObject>& bezierObjects, vector
             for (int j=0; j<divs; ++j) {
                 for (int i=0; i<divs; ++i) {
                     //visualization: j axis horizontal, i axis vertical
+                    //triangle 1
                     indices[k+0] = p + (divs+1)*(j+0) + (i+0); //left bottom
                     indices[k+1] = p + (divs+1)*(j+1) + (i+0); //right bottom
                     indices[k+2] = p + (divs+1)*(j+1) + (i+1); //right top
-                    indices[k+3] = p + (divs+1)*(j+0) + (i+1); //left top
-                    k += 4;
-                    numberOfIndicies+=4;
+                    //triangle 2
+                    indices[k+3] = p + (divs+1)*(j+0) + (i+0); //left bottom
+                    indices[k+4] = p + (divs+1)*(j+1) + (i+1); //right top
+                    indices[k+5] = p + (divs+1)*(j+0) + (i+1); //left top
+                    k += 6;
+                    numberOfIndicies+=6;
                     /*
                     if (indices[k+0] > biggestIndex) {
                         biggestIndex = indices[k+0];
