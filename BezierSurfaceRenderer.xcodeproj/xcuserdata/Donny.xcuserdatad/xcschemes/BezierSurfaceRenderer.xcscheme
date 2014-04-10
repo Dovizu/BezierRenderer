@@ -45,6 +45,10 @@
       <CommandLineArguments>
          <CommandLineArgument
             argument = "--testBEZParser"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-f test.bez 0.2"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument

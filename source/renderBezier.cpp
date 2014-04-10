@@ -8,6 +8,10 @@
 
 #include "renderBezier.h"
 #include "UnitTest.cpp"
+#include "BEZParser.h"
+#include "Tessellation.h"
+#include "UniformTessellation.h"
+#include "AdaptiveTessellation.h"
 
 int main(int argc, char *argv[]) {
     vector<CmdLineOptResult> *results;
@@ -51,7 +55,28 @@ int main(int argc, char *argv[]) {
     }
     
     //Render
-    
+    if ((!directoryName.empty() || !fileName.empty()) && param > 0.0) {
+        BEZParser *parser = new BEZParser();
+        Tessellation *tessellator;
+        vector<BezierObject> objects;
+        vector<Mesh> meshes;
+        
+        if (adaptive) {
+            tessellator = new AdaptiveTessellation();
+            tessellator->setErrorRate(param);
+        } else {
+            tessellator = new UniformTessellation();
+            tessellator->setDivDepth((int)(1/param));
+        }
+        if (!directoryName.empty()) {
+            parser->parseDirectory(directoryName, objects);
+        }
+        if (!fileName.empty()) {
+            parser->parseFile(fileName, objects);
+        }
+        tessellator->tessellate(objects, meshes);
+        //render mesh openGL
+    }
     
     return 0;
 }
