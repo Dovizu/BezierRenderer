@@ -12,7 +12,31 @@ AdaptiveTessellation::AdaptiveTessellation() {}
 
 void AdaptiveTessellation::tessellate(vector<BezierObject>& bezierObjects,
                 vector<Mesh>& meshes) {
-    
+    for (auto & object : bezierObjects) {
+        Mesh mesh = {AdaptiveMesh, 0, 0, NULL, NULL, new vector<Vector>};
+        //calculate fucking Bezier patches, getting all patchy patchy
+        Vector *patchControlPoints;
+        for (int currPatch=0; currPatch<object.numberOfPatches; ++currPatch) {
+            patchControlPoints = object.controlPoints+currPatch*16;
+            /*
+            uv=(0,1)    Patch      uv=(1,1)           
+                   D               C                  
+                    +–––––––––––––+                   
+                    |             |       v+          
+                    |             |        |          
+                    |             |        |          
+                    |             |        |          
+                    |             |        +–––––––––+
+                    +–––––––––––––+                  u
+                   A               B                  
+                 uv=(0,0)       uv=(1,0)              
+            */
+            ParametricPoint A(0,0);
+            ParametricPoint B(1,0);
+            ParametricPoint C(1,1);
+            ParametricPoint D(0,1);
+        }
+    }
 }
 
 Vector AdaptiveTessellation::evaluateBezierCurve(const Vector *ctrPts, const float &t) {

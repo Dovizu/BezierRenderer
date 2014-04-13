@@ -14,10 +14,14 @@
 
 /* Reference:
  typedef struct {
-    size_t numOfVertices;
-    size_t numOfIndices;
-    Vector *vertices;
-    int *indices;
+     MeshType type;
+     size_t numOfVertices;
+     size_t numOfIndices;
+     //for uniform tessellation
+     Vector *vertices;
+     int *indices;
+     //for adaptive tessellation
+     vector<Vector> *adaptiveVertices;
  } Mesh;
 
  typedef struct {

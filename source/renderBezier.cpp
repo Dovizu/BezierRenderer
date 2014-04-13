@@ -231,10 +231,11 @@ void renderToOpenGL(vector<RasterMesh> meshes) {
         
         //poll and process events
         glfwPollEvents();
-        
+        cout << glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) << endl;
+        //hanldes ESC quit
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
             glfwSetWindowShouldClose(window, GL_TRUE);
-        
+        //handles rotate and translate left
         if (glfwGetKey(window, GLFW_KEY_LEFT)) {
             if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT)) {
                 trans = Transform3fAffine(Translation3f(-0.01,0,0))*trans;
@@ -243,6 +244,7 @@ void renderToOpenGL(vector<RasterMesh> meshes) {
             }
             glUniformMatrix4fv(uniTrans, 1, GL_FALSE, trans.matrix().data());
         }
+        //handles rotate and translate right
         if (glfwGetKey(window, GLFW_KEY_RIGHT)) {
             if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT)) {
                 trans = Transform3fAffine(Translation3f(0.01,0,0))*trans;
@@ -251,6 +253,7 @@ void renderToOpenGL(vector<RasterMesh> meshes) {
             }
             glUniformMatrix4fv(uniTrans, 1, GL_FALSE, trans.matrix().data());
         }
+        //handles rotate and translate up
         if (glfwGetKey(window, GLFW_KEY_UP)) {
             if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT)) {
                 trans = Transform3fAffine(Translation3f(0,0.01,0))*trans;
@@ -259,6 +262,7 @@ void renderToOpenGL(vector<RasterMesh> meshes) {
             }
             glUniformMatrix4fv(uniTrans, 1, GL_FALSE, trans.matrix().data());
         }
+        //handles rotate and translate down
         if (glfwGetKey(window, GLFW_KEY_DOWN)) {
             if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT)) {
                 trans = Transform3fAffine(Translation3f(0,-0.01,0))*trans;
@@ -267,14 +271,15 @@ void renderToOpenGL(vector<RasterMesh> meshes) {
             }
             glUniformMatrix4fv(uniTrans, 1, GL_FALSE, trans.matrix().data());
         }
-        if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT)) {
-            if (glfwGetKey(window, GLFW_KEY_EQUAL)) {
-                trans = Transform3fAffine(Scaling3f(1.01,1.01,1.01))*trans;
-                glUniformMatrix4fv(uniTrans, 1, GL_FALSE, trans.matrix().data());
-            }else if (glfwGetKey(window, GLFW_KEY_MINUS)) {
-                trans = Transform3fAffine(Scaling3f(0.99,0.99,0.99))*trans;
-                glUniformMatrix4fv(uniTrans, 1, GL_FALSE, trans.matrix().data());
-            }
+        //handles zoom in
+        if (glfwGetKey(window, GLFW_KEY_EQUAL)) {
+            trans = Transform3fAffine(Scaling3f(1.01,1.01,1.01))*trans;
+            glUniformMatrix4fv(uniTrans, 1, GL_FALSE, trans.matrix().data());
+        }
+        //handles zoom out
+        if (glfwGetKey(window, GLFW_KEY_MINUS)) {
+            trans = Transform3fAffine(Scaling3f(0.99,0.99,0.99))*trans;
+            glUniformMatrix4fv(uniTrans, 1, GL_FALSE, trans.matrix().data());
         }
     }
     

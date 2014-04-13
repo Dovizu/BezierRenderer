@@ -12,11 +12,20 @@
 #include "utilities.h"
 #include "BEZParser.h"
 
+typedef enum {
+    UniformMesh,
+    AdaptiveMesh
+} MeshType;
+
 typedef struct {
+    MeshType type;
     size_t numOfVertices;
     size_t numOfIndices;
+    //for uniform tessellation
     Vector *vertices;
     int *indices;
+    //for adaptive tessellation
+    vector<Vector> *adaptiveVertices;
 } Mesh;
 
 class Tessellation {

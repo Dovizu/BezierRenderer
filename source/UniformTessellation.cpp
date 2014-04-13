@@ -67,7 +67,7 @@ void UniformTessellation::tessellate(vector<BezierObject>& bezierObjects, vector
                 }
             }
         }
-        Mesh mesh = {numberOfVertices, numberOfIndicies, vertices, indices};
+        Mesh mesh = {UniformMesh, numberOfVertices, numberOfIndicies, vertices, indices, NULL};
         meshes.push_back(mesh);
         //printf("Biggest Index: %d\n", biggestIndex);
     }
