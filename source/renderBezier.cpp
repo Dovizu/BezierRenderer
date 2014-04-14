@@ -232,6 +232,9 @@ void renderToOpenGL(vector<RasterMesh> meshes) {
     glEnableVertexAttribArray(posAttrib);
     glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
     
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+    
     while(!glfwWindowShouldClose(window))
     {
         //poll and process events
