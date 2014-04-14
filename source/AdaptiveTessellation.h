@@ -43,6 +43,13 @@ private:
     Vector evaluateBezierPatch(const Vector *controlPoints,
                                const float &u,
                                const float &v);
+    Vector evaluateBezierPatch(const Vector *controlPoints,
+                               const ParametricPoint& UV);
+    void evaluateAdaptiveTriangle(const ParametricPoint& A,
+                                  const ParametricPoint& B,
+                                  const ParametricPoint& C,
+                                  const Vector *ctrPts,
+                                  Mesh& mesh);
 };
 
 #endif /* defined(__BezierSurfaceRenderer__AdaptiveTessellation__) */

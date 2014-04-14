@@ -11,4 +11,11 @@
 
 #include "utilities.h"
 
+typedef struct {
+    size_t numOfIndices;
+    size_t numOfVertices;
+    float *vertices;
+    int *indices;
+} RasterMesh;
+
 #endif /* defined(__BezierSurfaceRenderer__renderBezier__) */

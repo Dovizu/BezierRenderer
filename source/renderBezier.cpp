@@ -13,13 +13,6 @@
 #include "UniformTessellation.h"
 #include "AdaptiveTessellation.h"
 
-typedef struct {
-    size_t numOfIndices;
-    size_t numOfVertices;
-    float *vertices;
-    int *indices;
-} RasterMesh;
-
 void rasterizeMeshes(vector<Mesh>& meshes, vector<RasterMesh>& rasters);
 void renderToOpenGL(vector<RasterMesh> meshes);
 
@@ -29,6 +22,7 @@ int main(int argc, char *argv[]) {
     string options = "--testOpenGL(0)"; //test OpenGL, GLEW, and GLFW
     options.append("--testBEZParser(0)"); //test BEZParser for files at "bezFiles/"
     options.append("--testUniform(0)"); //test UniformTessellation
+    options.append("--testAdaptive(0)"); //test AdaptiveTessellation
     
     options.append("-f(2)"); //render file, param
     options.append("-d(2)"); //render directory of files, param
@@ -50,6 +44,9 @@ int main(int argc, char *argv[]) {
         }
         if (result.optName.compare("--testUniform")==0) {
             testUniform();
+        }
+        if (result.optName.compare("--testAdaptive")==0) {
+            testAdaptive();
         }
         if (result.optName.compare("-f")==0) {
             fileName = result.args->at(0);
@@ -96,19 +93,37 @@ int main(int argc, char *argv[]) {
 
 void rasterizeMeshes(vector<Mesh>& meshes, vector<RasterMesh>& rasters) {
     for (auto & mesh : meshes) {
-        RasterMesh raster;
-        float *newVertices = new float[mesh.numOfVertices*3];
-        for (int vertex=0; vertex < mesh.numOfVertices; vertex++) {
-            newVertices[vertex*3+0] = mesh.vertices[vertex](0);
-            newVertices[vertex*3+1] = mesh.vertices[vertex](1);
-            newVertices[vertex*3+2] = mesh.vertices[vertex](2);
+        if (mesh.type == UniformMesh) {
+            RasterMesh raster;
+            float *newVertices = new float[mesh.numOfVertices*3];
+            for (int vertex=0; vertex < mesh.numOfVertices; vertex++) {
+                newVertices[vertex*3+0] = mesh.vertices[vertex](0);
+                newVertices[vertex*3+1] = mesh.vertices[vertex](1);
+                newVertices[vertex*3+2] = mesh.vertices[vertex](2);
+            }
+            delete mesh.vertices;
+            raster.vertices = newVertices;
+            raster.numOfVertices = mesh.numOfVertices*3;
+            raster.indices = mesh.indices;
+            raster.numOfIndices = mesh.numOfIndices;
+            rasters.push_back(raster);
+        }else if (mesh.type == AdaptiveMesh){
+            RasterMesh raster;
+            float *newVertices = new float[mesh.numOfVertices*3];
+            int *newIndices = new int[mesh.numOfIndices];
+            for (int vertex=0; vertex < mesh.numOfVertices; vertex++) {
+                newVertices[vertex*3+0] = mesh.adaptiveVertices->at(vertex)(0);
+                newVertices[vertex*3+1] = mesh.adaptiveVertices->at(vertex)(1);
+                newVertices[vertex*3+2] = mesh.adaptiveVertices->at(vertex)(2);
+                newIndices[vertex] = vertex;
+            }
+            delete mesh.adaptiveVertices;
+            raster.vertices = newVertices;
+            raster.indices = newIndices;
+            raster.numOfIndices = mesh.numOfIndices;
+            raster.numOfVertices = mesh.numOfVertices*3;
+            rasters.push_back(raster);
         }
-        delete mesh.vertices;
-        raster.vertices = newVertices;
-        raster.numOfVertices = mesh.numOfVertices*3;
-        raster.indices = mesh.indices;
-        raster.numOfIndices = mesh.numOfIndices;
-        rasters.push_back(raster);
     }
 }
 
@@ -219,18 +234,23 @@ void renderToOpenGL(vector<RasterMesh> meshes) {
     
     while(!glfwWindowShouldClose(window))
     {
-        //render here
+        //poll and process events
+        glfwPollEvents();
+        
+        GLenum drawingMode = GL_TRIANGLES;
+
+        if (glfwGetKey(window, GLFW_KEY_W)) {
+            drawingMode = GL_TRIANGLES ? GL_LINE_LOOP : GL_TRIANGLES;
+        }
         // Clear the screen to black
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         
         // Draw a rectangle from the 2 triangles using 6 indices
-        glDrawElements(GL_TRIANGLES, mesh.numOfIndices, GL_UNSIGNED_INT, 0);
+        glDrawElements(drawingMode, mesh.numOfIndices, GL_UNSIGNED_INT, 0);
         
         glfwSwapBuffers(window);
         
-        //poll and process events
-        glfwPollEvents();
         cout << glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) << endl;
         //hanldes ESC quit
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)

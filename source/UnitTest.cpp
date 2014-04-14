@@ -11,6 +11,18 @@
 #include "utilities.h"
 #include "BEZParser.h"
 #include "UniformTessellation.h"
+#include "AdaptiveTessellation.h"
+
+void testAdaptive() {
+    BEZParser parser;
+    vector<BezierObject> objects;
+    string basePath = "bezFiles/";
+    parser.parseDirectory(basePath, objects);
+    AdaptiveTessellation adaptive;
+    vector<Mesh> meshes;
+    adaptive.tessellate(objects, meshes);
+    Mesh mesh = meshes.at(0);
+}
 
 void testUniform() {
     BEZParser parser;
