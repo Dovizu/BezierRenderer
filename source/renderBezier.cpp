@@ -160,6 +160,7 @@ void renderToOpenGL(vector<RasterMesh> meshes) {
         cerr << "GLFW cannot initialize" << endl;
         return;
     }
+    
     //Only version 3.2 and up
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
@@ -231,9 +232,6 @@ void renderToOpenGL(vector<RasterMesh> meshes) {
     GLint posAttrib = glGetAttribLocation(shaderProgram, "position");
     glEnableVertexAttribArray(posAttrib);
     glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    
-    glEnable(GL_LIGHTING);
-    glEnable(GL_LIGHT0);
     
     while(!glfwWindowShouldClose(window))
     {
