@@ -14,7 +14,7 @@ GLEW_LINK = -L$(LIB)/GLEW/lib -lGLEW
 ifeq ($(shell sw_vers 2>/dev/null | grep Mac | awk '{ print $$2}'),Mac)
     CC = clang++ -std=c++11 -stdlib=libc++
 	CFLAGS = -g -c -Wall -Wno-deprecated $(EIGEN) $(GLFW_COMP) $(GLEW_COMP) $(DEBUG)
-	LFLAGS = -Wall $(GLFW_LINK) $(GLEW_LINK) -framework OpenGL
+	LFLAGS = -Wall $(GLFW_LINK) $(GLEW_LINK) -framework OpenGL -framework GLUT
 else
 
 endif

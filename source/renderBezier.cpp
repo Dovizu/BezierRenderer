@@ -15,6 +15,9 @@
 
 void rasterizeMeshes(vector<Mesh>& meshes, vector<RasterMesh>& rasters);
 void renderToOpenGL(vector<RasterMesh> meshes);
+void renderToOldOpenGL(int argc, char *argv[]);
+
+vector<RasterMesh> rasterMeshes;
 
 int main(int argc, char *argv[]) {
     vector<CmdLineOptResult> *results;
@@ -83,9 +86,8 @@ int main(int argc, char *argv[]) {
         }
         tessellator->tessellate(objects, meshes);
         //render mesh openGL
-        vector<RasterMesh> rasterMeshes;
         rasterizeMeshes(meshes, rasterMeshes);
-        renderToOpenGL(rasterMeshes);
+        renderToOldOpenGL(argc, argv);
     }
     return 0;
 }
@@ -136,6 +138,94 @@ void rasterizeMeshes(vector<Mesh>& meshes, vector<RasterMesh>& rasters) {
  int *indices;
  } Mesh;
  */
+
+
+
+
+bool* keyStates = new bool[256]; // Create an array of boolean values of length 256 (0-255)
+void keyOperations (void) {
+    if (keyStates[GLUT_KEY_LEFT]) { // If the left arrow key has been pressed
+        // Perform left arrow key operations
+    }  
+}
+void keyPressed (unsigned char key, int x, int y) {
+    keyStates[key] = true; // Set the state of the current key to pressed
+}
+void keyUp (unsigned char key, int x, int y) {
+    keyStates[key] = false; // Set the state of the current key to not pressed
+}
+
+void reshape (int width, int height) {
+    glViewport(0, 0, (GLsizei)width, (GLsizei)height); // Set our viewport to the size of our window
+    glMatrixMode(GL_PROJECTION); // Switch to the projection matrix so that we can manipulate how our scene is viewed
+    glLoadIdentity(); // Reset the projection matrix to the identity matrix so that we don't get any artifacts (cleaning up)
+    gluPerspective(60, (GLfloat)width / (GLfloat)height, 1.0, 100.0); // Set the Field of view angle (in degrees), the aspect ratio of our window, and the new and far planes
+    glMatrixMode(GL_MODELVIEW); // Switch back to the model view matrix, so that we can start drawing shapes correctly
+}
+
+void renderMesh() {
+    
+    RasterMesh rasterMesh = rasterMeshes[0];
+    for (int v = 0; v < rasterMesh.numOfVertices; v+=9) {
+        glBegin(GL_TRIANGLES);
+        glVertex3f(rasterMesh.vertices[v+0],
+                   rasterMesh.vertices[v+1],
+                   rasterMesh.vertices[v+2]);
+        glVertex3f(rasterMesh.vertices[v+3],
+                   rasterMesh.vertices[v+4],
+                   rasterMesh.vertices[v+5]);
+        glVertex3f(rasterMesh.vertices[v+6],
+                   rasterMesh.vertices[v+7],
+                   rasterMesh.vertices[v+8]);
+//        glColor3f(1.0, 0.0, 0.0);
+        glEnd();
+    }
+}
+
+void display (void) {
+    glClearColor (0.0,0.0,0.0,1.0); //clear the screen to
+    glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glLoadIdentity();
+    
+    GLfloat DiffuseLight[] = {1, 0, 0}; //set DiffuseLight
+    GLfloat AmbientLight[] = {1, 0, 0}; //set AmbientLight
+    GLfloat whiteSpecularLight[] = {1.0, 1.0, 1.0};
+    
+    glLightfv (GL_LIGHT0, GL_DIFFUSE, DiffuseLight); //change
+    glLightfv (GL_LIGHT1, GL_AMBIENT, AmbientLight); //change
+    
+    GLfloat LightPosition[] = {0, 0, 1, 0}; //set the
+    glLightfv (GL_LIGHT0, GL_POSITION, LightPosition);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, whiteSpecularLight);
+
+    gluLookAt (0.0, 0.0, 5.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+    glTranslatef(0.0f, 0.0f, -10.0f); // Push eveything 5 units back into the scene, otherwise we won't see the primitive
+    glRotatef(90, 1.0, 0.0, 0.0); //rotate on the x axis
+    renderMesh();
+    glutSwapBuffers(); // Flush the OpenGL buffers to the window
+}
+
+void renderToOldOpenGL(int argc, char *argv[]) {
+    glutInit(&argc, argv); // Initialize GLUT
+    glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
+    glutInitWindowSize (800, 600); // Set the width and height of the window
+    glutInitWindowPosition (100, 100); // Set the position of the window
+    glutCreateWindow ("BezierRenderer Leo C. & Donny R."); // Set the title for the window
+    //for lighting
+    glEnable (GL_DEPTH_TEST);
+    glEnable (GL_LIGHTING);
+    glEnable (GL_LIGHT0);
+    glEnable (GL_LIGHT1);
+    glShadeModel(GL_SMOOTH);
+    glEnable(GL_NORMALIZE);
+    
+    glutDisplayFunc(display); // Tell GLUT to use the method "display" for rendering
+    glutIdleFunc (display);
+    glutReshapeFunc(reshape); // Tell GLUT to use the method "reshape" for reshaping
+    
+    glutMainLoop(); // Enter GLUT's main loop
+}
+
 void renderToOpenGL(vector<RasterMesh> meshes) {
     // Shader sources
     const GLchar* vertexSource =

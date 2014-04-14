@@ -16,7 +16,7 @@
 //#include <OpenGL/gl.h> (Included by glew.h)
 #include <GL/glew.h>
 #include <OpenGL/glu.h>
-//#include <GLUT/glut.h> (Outdated)
+#include <GLUT/glut.h> //(Outdated)
 #include <GLFW/glfw3.h>
 #include <thread>
 
