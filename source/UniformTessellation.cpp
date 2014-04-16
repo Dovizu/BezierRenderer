@@ -102,12 +102,12 @@ Vector UniformTessellation::evaluateSurfaceNormal(const Vector *controlPoints,
                                                   const float &v)
 {
     Vector partialU[4];
-    Vector partialV[4];
+    Vector uCurve[4];
     
     for (int i = 0; i < 4; ++i) partialU[i] = evaluateTangent(controlPoints + 4 * i, u);
-    for (int i = 0; i < 4; ++i) partialV[i] = evaluateTangent(controlPoints + 4 * i, v);
+    for (int i = 0; i < 4; ++i) uCurve[i] = evaluateBezierCurve(controlPoints + 4 * i, u);
     
-    return (evaluateBezierCurve(partialU, v).cross(evaluateBezierCurve(partialV, u))).normalized();
+    return (evaluateBezierCurve(partialU, v).cross(evaluateTangent(uCurve, v))).normalized();
 }
 
 Vector UniformTessellation::evaluateTangent(const Vector *ctrPts, const float &t) {

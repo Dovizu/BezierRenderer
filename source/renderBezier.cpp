@@ -127,8 +127,9 @@ void rasterizeMeshes(vector<Mesh>& meshes, vector<RasterMesh>& rasters) {
     }
 }
 
-void transformUniform(GLint& uniTrans, Transform3fAffine& trans) {
+void transformUniform(GLint& uniTrans, GLint& uniTransIT, Transform3fAffine& trans) {
     glUniformMatrix4fv(uniTrans, 1, GL_FALSE, trans.matrix().data());
+    glUniformMatrix4fv(uniTransIT, 1, GL_FALSE, trans.matrix().inverse().transpose().data());
 }
 
 /*
@@ -171,11 +172,11 @@ void renderToOpenGL(vector<RasterMesh> meshes) {
     "    vec3 diffuseReflection = vec3(light0.diffuse) * vec3(mymaterial.diffuse) * max(0.0,dot(normalDirection, lightDirection));"
     "    color = vec4(diffuseReflection, 1.0);"
     "}";
-    
+
     
     const GLchar* fragmentSource =
     "#version 150 core\n"
-    "varying vec3 color;"
+    "varying vec4 color;"
     "void main() {"
     "   gl_FragColor = color;"
     "}";
@@ -239,6 +240,9 @@ void renderToOpenGL(vector<RasterMesh> meshes) {
     GLint uniTrans = glGetUniformLocation(shaderProgram, "trans");
     glUniformMatrix4fv(uniTrans, 1, GL_FALSE, trans.matrix().data());
     
+    GLint uniTransIT = glGetUniformLocation(shaderProgram, "trans_it");
+    glUniformMatrix4fv(uniTrans, 1, GL_FALSE, trans.matrix().inverse().transpose().data());
+    
     RasterMesh mesh = meshes.at(0);
     /* Create 3D Buffer */
     
@@ -269,14 +273,14 @@ void renderToOpenGL(vector<RasterMesh> meshes) {
                           6*sizeof(float), //stride
                           0); //offset
     
-//    GLint normalAttrib = glGetAttribLocation(shaderProgram, "normal");
-//    glEnableVertexAttribArray(normalAttrib);
-//    glVertexAttribPointer(normalAttrib,
-//                          3,
-//                          GL_FLOAT,
-//                          GL_TRUE,
-//                          3*sizeof(float),
-//                          (void*)(3*sizeof(float)));
+    GLint normalAttrib = glGetAttribLocation(shaderProgram, "normal");
+    glEnableVertexAttribArray(normalAttrib);
+    glVertexAttribPointer(normalAttrib,
+                          3,
+                          GL_FLOAT,
+                          GL_TRUE,
+                          3*sizeof(float),
+                          (void*)(3*sizeof(float)));
     
     while(!glfwWindowShouldClose(window))
     {
@@ -308,7 +312,7 @@ void renderToOpenGL(vector<RasterMesh> meshes) {
             }else{
                 trans = Transform3fAffine(AngleAxisf(-M_PI/128,Vector3f::UnitY()))*trans;
             }
-            glUniformMatrix4fv(uniTrans, 1, GL_FALSE, trans.matrix().data());
+            transformUniform(uniTrans, uniTransIT, trans);
         }
         //handles rotate and translate right
         if (glfwGetKey(window, GLFW_KEY_RIGHT)) {
@@ -317,7 +321,7 @@ void renderToOpenGL(vector<RasterMesh> meshes) {
             }else{
                 trans = Transform3fAffine(AngleAxisf(M_PI/128,Vector3f::UnitY()))*trans;
             }
-            glUniformMatrix4fv(uniTrans, 1, GL_FALSE, trans.matrix().data());
+            transformUniform(uniTrans, uniTransIT, trans);
         }
         //handles rotate and translate up
         if (glfwGetKey(window, GLFW_KEY_UP)) {
@@ -326,7 +330,7 @@ void renderToOpenGL(vector<RasterMesh> meshes) {
             }else{
                 trans = Transform3fAffine(AngleAxisf(-M_PI/128,Vector3f::UnitX()))*trans;
             }
-            glUniformMatrix4fv(uniTrans, 1, GL_FALSE, trans.matrix().data());
+            transformUniform(uniTrans, uniTransIT, trans);
         }
         //handles rotate and translate down
         if (glfwGetKey(window, GLFW_KEY_DOWN)) {
@@ -335,17 +339,17 @@ void renderToOpenGL(vector<RasterMesh> meshes) {
             }else{
                 trans = Transform3fAffine(AngleAxisf(M_PI/128,Vector3f::UnitX()))*trans;
             }
-            glUniformMatrix4fv(uniTrans, 1, GL_FALSE, trans.matrix().data());
+            transformUniform(uniTrans, uniTransIT, trans);
         }
         //handles zoom in
         if (glfwGetKey(window, GLFW_KEY_EQUAL)) {
             trans = Transform3fAffine(Scaling3f(1.01,1.01,1.01))*trans;
-            glUniformMatrix4fv(uniTrans, 1, GL_FALSE, trans.matrix().data());
+            transformUniform(uniTrans, uniTransIT, trans);
         }
         //handles zoom out
         if (glfwGetKey(window, GLFW_KEY_MINUS)) {
             trans = Transform3fAffine(Scaling3f(0.99,0.99,0.99))*trans;
-            glUniformMatrix4fv(uniTrans, 1, GL_FALSE, trans.matrix().data());
+            transformUniform(uniTrans, uniTransIT, trans);
         }
     }
     
