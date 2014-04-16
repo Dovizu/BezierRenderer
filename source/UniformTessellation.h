@@ -41,6 +41,10 @@ private:
     Vector evaluateBezierPatch(const Vector *controlPoints,
                                const float &u,
                                const float &v);
+    Vector evaluateSurfaceNormal(const Vector *controlPoints,
+                                 const float &u,
+                                 const float &v);
+    Vector evaluateTangent(const Vector *ctrPts, const float &t);
 };
 
 #endif /* defined(__BezierSurfaceRenderer__UniformTessellation__) */
