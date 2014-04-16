@@ -166,17 +166,26 @@ void reshape (int width, int height) {
 void renderMesh() {
     
     RasterMesh rasterMesh = rasterMeshes[0];
-    for (int v = 0; v < rasterMesh.numOfVertices; v+=9) {
+    for (int v = 0; v < rasterMesh.numOfVertices; v+=18) {
         glBegin(GL_TRIANGLES);
+        glNormal3f(rasterMesh.vertices[v+3],
+                   rasterMesh.vertices[v+4],
+                   rasterMesh.vertices[v+5]);
         glVertex3f(rasterMesh.vertices[v+0],
                    rasterMesh.vertices[v+1],
                    rasterMesh.vertices[v+2]);
-        glVertex3f(rasterMesh.vertices[v+3],
-                   rasterMesh.vertices[v+4],
-                   rasterMesh.vertices[v+5]);
+        glNormal3f(rasterMesh.vertices[v+9],
+                   rasterMesh.vertices[v+10],
+                   rasterMesh.vertices[v+11]);
         glVertex3f(rasterMesh.vertices[v+6],
                    rasterMesh.vertices[v+7],
                    rasterMesh.vertices[v+8]);
+        glNormal3f(rasterMesh.vertices[v+15],
+                   rasterMesh.vertices[v+16],
+                   rasterMesh.vertices[v+17]);
+        glVertex3f(rasterMesh.vertices[v+12],
+                   rasterMesh.vertices[v+13],
+                   rasterMesh.vertices[v+14]);
 //        glColor3f(1.0, 0.0, 0.0);
         glEnd();
     }
