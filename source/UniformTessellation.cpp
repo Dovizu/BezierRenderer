@@ -15,10 +15,10 @@ void UniformTessellation::tessellate(vector<BezierObject>& bezierObjects, vector
         //int biggestIndex = 0;
         size_t numberOfVertices = 0;
         size_t numberOfIndicies = 0;
-        size_t numVerticesPerPatch = (divs+1)*(divs+1);
+        size_t numVerticesPerPatch = (divs+1)*(divs+1) *2; //*2 for vertex + normal
         size_t numIndiciesPerPatch = divs*divs*6;
         //total list of vertices
-        Vector *vertices = new Vector[numVerticesPerPatch * object.numberOfPatches];
+        Vector *vertices = new Vector[numVerticesPerPatch*object.numberOfPatches];
         //total list of indices
         int *indices = new int[numIndiciesPerPatch * object.numberOfPatches];
         
@@ -30,7 +30,11 @@ void UniformTessellation::tessellate(vector<BezierObject>& bezierObjects, vector
             int k = currPatch*numVerticesPerPatch;
             for (int i=0; i<=divs; ++i) {
                 for (int j=0; j<=divs; ++j) {
+                    //evaluate vertex
                     vertices[k++] = evaluateBezierPatch(patchControlPoints,i/(float)divs,j/(float)divs);
+                    ++numberOfVertices;
+                    //evaluate normal
+                    vertices[k++] = evaluateSurfaceNormal(patchControlPoints,i/(float)divs,j/(float)divs);
                     ++numberOfVertices;
                 }
             }
@@ -41,13 +45,13 @@ void UniformTessellation::tessellate(vector<BezierObject>& bezierObjects, vector
                 for (int i=0; i<divs; ++i) {
                     //visualization: j axis horizontal, i axis vertical
                     //triangle 1
-                    indices[k+0] = p + (divs+1)*(j+0) + (i+0); //left bottom
-                    indices[k+1] = p + (divs+1)*(j+1) + (i+0); //right bottom
-                    indices[k+2] = p + (divs+1)*(j+1) + (i+1); //right top
+                    indices[k+0] = p + 2*(divs+1)*(j+0) + 2*(i+0); //left bottom
+                    indices[k+1] = p + 2*(divs+1)*(j+1) + 2*(i+0); //right bottom
+                    indices[k+2] = p + 2*(divs+1)*(j+1) + 2*(i+1); //right top
                     //triangle 2
-                    indices[k+3] = p + (divs+1)*(j+0) + (i+0); //left bottom
-                    indices[k+4] = p + (divs+1)*(j+1) + (i+1); //right top
-                    indices[k+5] = p + (divs+1)*(j+0) + (i+1); //left top
+                    indices[k+3] = p + 2*(divs+1)*(j+0) + 2*(i+0); //left bottom
+                    indices[k+4] = p + 2*(divs+1)*(j+1) + 2*(i+1); //right top
+                    indices[k+5] = p + 2*(divs+1)*(j+0) + 2*(i+1); //left top
                     k += 6;
                     numberOfIndicies+=6;
                     /*
