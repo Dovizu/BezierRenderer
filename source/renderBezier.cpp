@@ -231,11 +231,9 @@ void renderToOpenGL(vector<RasterMesh> meshes) {
     const GLchar* vertexSource =
     "#version 150 core\n"
     "in vec3 position;"
-    "in vec3 color;"
-    "out vec3 Color;"
+    "in vec3 normal;"
     "uniform mat4 trans;"
     "void main() {"
-    "   Color = color;"
     "   gl_Position = trans * vec4(position, 1.0);"
     "}";
     const GLchar* fragmentSource =
