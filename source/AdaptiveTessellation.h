@@ -50,6 +50,10 @@ private:
                                   const ParametricPoint& C,
                                   const Vector *ctrPts,
                                   Mesh& mesh);
+    Vector evaluateSurfaceNormal(const Vector *controlPoints,
+                                 const float &u,
+                                 const float &v);
+    Vector evaluateTangent(const Vector *ctrPts, const float &t);
 };
 
 #endif /* defined(__BezierSurfaceRenderer__AdaptiveTessellation__) */

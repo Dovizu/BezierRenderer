@@ -142,3 +142,24 @@ Vector AdaptiveTessellation::evaluateBezierPatch(const Vector *controlPoints,
                                                  const ParametricPoint& UV) {
     return evaluateBezierPatch(controlPoints, UV(0), UV(1));
 }
+
+Vector AdaptiveTessellation::evaluateSurfaceNormal(const Vector *controlPoints,
+                                                  const float &u,
+                                                  const float &v)
+{
+    Vector partialU[4];
+    Vector uCurve[4];
+    
+    for (int i = 0; i < 4; ++i) partialU[i] = evaluateTangent(controlPoints + 4 * i, u);
+    for (int i = 0; i < 4; ++i) uCurve[i] = evaluateBezierCurve(controlPoints + 4 * i, u);
+    
+    return (evaluateBezierCurve(partialU, v).cross(evaluateTangent(uCurve, v))).normalized();
+}
+
+Vector AdaptiveTessellation::evaluateTangent(const Vector *ctrPts, const float &t) {
+    float b0 = -3 * (1 - t) * (1 - t);
+    float b1 = 3 * (1 - t) * (1 - t) - 6 * t * (1 - t);
+    float b2 = 6 * t * (1 - t) - 3 * t * t;
+    float b3 = 3 * t * t;
+    return ctrPts[0] * b0 + ctrPts[1] * b1 + ctrPts[2] * b2 + ctrPts[3] * b3;
+}
