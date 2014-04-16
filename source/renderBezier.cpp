@@ -229,7 +229,21 @@ void renderToOpenGL(vector<RasterMesh> meshes) {
     // Specify the layout of the vertex data
     GLint posAttrib = glGetAttribLocation(shaderProgram, "position");
     glEnableVertexAttribArray(posAttrib);
-    glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glVertexAttribPointer(posAttrib,
+                          3,
+                          GL_FLOAT,
+                          GL_FALSE,
+                          6*sizeof(float), //stride
+                          0); //offset
+    
+//    GLint normalAttrib = glGetAttribLocation(shaderProgram, "normal");
+//    glEnableVertexAttribArray(normalAttrib);
+//    glVertexAttribPointer(normalAttrib,
+//                          3,
+//                          GL_FLOAT,
+//                          GL_TRUE,
+//                          3*sizeof(float),
+//                          (void*)(3*sizeof(float)));
     
     while(!glfwWindowShouldClose(window))
     {
