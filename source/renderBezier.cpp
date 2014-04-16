@@ -98,7 +98,7 @@ void rasterizeMeshes(vector<Mesh>& meshes, vector<RasterMesh>& rasters) {
         if (mesh.type == UniformMesh) {
             RasterMesh raster;
             float *newVertices = new float[mesh.numOfVertices*3];
-            for (int vertex=0; vertex < mesh.numOfVertices; vertex++) {
+            for (int vertex=0; vertex < mesh.numOfIndices; vertex++) {
                 newVertices[vertex*3+0] = mesh.vertices[vertex](0);
                 newVertices[vertex*3+1] = mesh.vertices[vertex](1);
                 newVertices[vertex*3+2] = mesh.vertices[vertex](2);
@@ -166,17 +166,26 @@ void reshape (int width, int height) {
 void renderMesh() {
     
     RasterMesh rasterMesh = rasterMeshes[0];
-    for (int v = 0; v < rasterMesh.numOfVertices; v+=9) {
+    for (int v = 0; v < rasterMesh.numOfVertices; v+=18) {
         glBegin(GL_TRIANGLES);
+//        glNormal3f(rasterMesh.vertices[v+3],
+//                   rasterMesh.vertices[v+4],
+//                   rasterMesh.vertices[v+5]);
         glVertex3f(rasterMesh.vertices[v+0],
                    rasterMesh.vertices[v+1],
                    rasterMesh.vertices[v+2]);
-        glVertex3f(rasterMesh.vertices[v+3],
-                   rasterMesh.vertices[v+4],
-                   rasterMesh.vertices[v+5]);
+//        glNormal3f(rasterMesh.vertices[v+9],
+//                   rasterMesh.vertices[v+10],
+//                   rasterMesh.vertices[v+11]);
         glVertex3f(rasterMesh.vertices[v+6],
                    rasterMesh.vertices[v+7],
                    rasterMesh.vertices[v+8]);
+//        glNormal3f(rasterMesh.vertices[v+15],
+//                   rasterMesh.vertices[v+16],
+//                   rasterMesh.vertices[v+17]);
+        glVertex3f(rasterMesh.vertices[v+12],
+                   rasterMesh.vertices[v+13],
+                   rasterMesh.vertices[v+14]);
 //        glColor3f(1.0, 0.0, 0.0);
         glEnd();
     }
@@ -191,11 +200,11 @@ void display (void) {
     GLfloat AmbientLight[] = {1, 0, 0}; //set AmbientLight
     GLfloat whiteSpecularLight[] = {1.0, 1.0, 1.0};
     
-    glLightfv (GL_LIGHT0, GL_DIFFUSE, DiffuseLight); //change
-    glLightfv (GL_LIGHT1, GL_AMBIENT, AmbientLight); //change
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, DiffuseLight); //change
+    glLightfv(GL_LIGHT1, GL_AMBIENT, AmbientLight); //change
     
     GLfloat LightPosition[] = {0, 0, 1, 0}; //set the
-    glLightfv (GL_LIGHT0, GL_POSITION, LightPosition);
+    glLightfv(GL_LIGHT0, GL_POSITION, LightPosition);
     glLightfv(GL_LIGHT0, GL_SPECULAR, whiteSpecularLight);
 
     gluLookAt (0.0, 0.0, 5.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
