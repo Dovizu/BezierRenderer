@@ -55,18 +55,18 @@ void UniformTessellation::tessellate(vector<BezierObject>& bezierObjects, vector
                     k += 6;
                     numberOfIndicies+=6;
                     /*
-                    if (indices[k+0] > biggestIndex) {
-                        biggestIndex = indices[k+0];
-                    }
-                    if (indices[k+1] > biggestIndex) {
-                        biggestIndex = indices[k+1];
-                    }
-                    if (indices[k+2] > biggestIndex) {
-                        biggestIndex = indices[k+2];
-                    }
-                    if (indices[k+3] > biggestIndex) {
-                        biggestIndex = indices[k+3];
-                    }
+                     if (indices[k+0] > biggestIndex) {
+                     biggestIndex = indices[k+0];
+                     }
+                     if (indices[k+1] > biggestIndex) {
+                     biggestIndex = indices[k+1];
+                     }
+                     if (indices[k+2] > biggestIndex) {
+                     biggestIndex = indices[k+2];
+                     }
+                     if (indices[k+3] > biggestIndex) {
+                     biggestIndex = indices[k+3];
+                     }
                      */
                 }
             }
