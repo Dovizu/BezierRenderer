@@ -127,6 +127,10 @@ void rasterizeMeshes(vector<Mesh>& meshes, vector<RasterMesh>& rasters) {
     }
 }
 
+void transformUniform(GLint& uniTrans, Transform3fAffine& trans) {
+    glUniformMatrix4fv(uniTrans, 1, GL_FALSE, trans.matrix().data());
+}
+
 /*
  Reference:
  typedef struct {
@@ -142,16 +146,38 @@ void renderToOpenGL(vector<RasterMesh> meshes) {
     "#version 150 core\n"
     "in vec3 position;"
     "in vec3 normal;"
+    "varying vec4 color;"
     "uniform mat4 trans;"
+    "uniform mat4 trans_it"
+    "struct lightSource"
+    "{"
+    "    vec4 position;"
+    "    vec4 diffuse;"
+    "};"
+    "lightSource light0 = lightSource("
+    "                                 vec4(-1.0, 1.0, -1.0, 0.0),"
+    "                                 vec4(1.0, 1.0, 1.0, 1.0)"
+    "                                 );"
+    "struct material"
+    "{"
+    "    vec4 diffuse;"
+    "};"
+    "material mymaterial = material(vec4(1.0, 0.8, 0.8, 1.0));"
+    
     "void main() {"
     "   gl_Position = trans * vec4(position, 1.0);"
+    "    vec3 normalDirection = normalize(trans_it * normal);"
+    "    vec3 lightDirection = normalize(vec3(light0.position));"
+    "    vec3 diffuseReflection = vec3(light0.diffuse) * vec3(mymaterial.diffuse) * max(0.0,dot(normalDirection, lightDirection));"
+    "    color = vec4(diffuseReflection, 1.0);"
     "}";
+    
+    
     const GLchar* fragmentSource =
     "#version 150 core\n"
-    "uniform vec3 Color;"
-    "out vec4 outColor;"
+    "varying vec3 color;"
     "void main() {"
-    "   outColor = vec4(Color, 1.0);"
+    "   gl_FragColor = color;"
     "}";
     
     if (!glfwInit()) {
@@ -180,10 +206,17 @@ void renderToOpenGL(vector<RasterMesh> meshes) {
         return;
     }
     
+    GLint compile_ok = GL_FALSE, link_ok = GL_FALSE;
+    
     // Create and compile the vertex shader
     GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertexShader, 1, &vertexSource, NULL);
     glCompileShader(vertexShader);
+    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &compile_ok);
+    if (!compile_ok) {
+        fprintf(stderr, "Error in fragment shader\n");
+        exit(-1);
+    }
     
     // Create and compile the fragment shader
     GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
@@ -194,15 +227,15 @@ void renderToOpenGL(vector<RasterMesh> meshes) {
     GLuint shaderProgram = glCreateProgram();
     glAttachShader(shaderProgram, vertexShader);
     glAttachShader(shaderProgram, fragmentShader);
-    glBindFragDataLocation(shaderProgram, 0, "outColor");
+    glBindFragDataLocation(shaderProgram, 0, "color");
     glLinkProgram(shaderProgram);
     glUseProgram(shaderProgram);
     
     // Uniform Transformation
     Transform3fAffine trans(Translation3f(0,1,-3.5));
     trans = trans*Transform3fAffine(AngleAxisf(0.25*M_PI, Vector3f::UnitX()));
-    GLint uniColor = glGetUniformLocation(shaderProgram, "Color");
-    glUniform3f(uniColor, 0.5f, 0.5f, 0.5f);
+//    GLint uniColor = glGetUniformLocation(shaderProgram, "Color");
+//    glUniform3f(uniColor, 0.5f, 0.5f, 0.5f);
     GLint uniTrans = glGetUniformLocation(shaderProgram, "trans");
     glUniformMatrix4fv(uniTrans, 1, GL_FALSE, trans.matrix().data());
     
