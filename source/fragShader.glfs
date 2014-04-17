@@ -1,0 +1,29 @@
+#version 150
+ 
+out vec4 colorOut;
+
+vec3 kd = vec3(0.1, 1, 0.1);
+vec3 ka = vec3(1, 1.0, 1.0);
+vec3 ks = vec3(0.5, 1, 0.5);
+float sp = 90;
+vec3 intensity = vec3(1, 1, 1);
+
+in VertexData {
+    vec3 normal;
+    vec3 eye;
+    vec3 lightDir;
+} VertexIn;
+
+void main()
+{
+    vec3 n = normalize(VertexIn.normal);
+	vec3 l = normalize(VertexIn.lightDir);
+	vec3 e = normalize(VertexIn.eye);
+
+    vec3 diffuse = kd*intensity*max(0, dot(l, n));
+    vec3 r = -l + 2*dot(l,n) * n;
+    vec3 specular = ks*intensity*max(pow(dot(r, e), sp),0);
+
+//    colorOut = vec4(ka * intensity, 1);
+    colorOut = vec4(1,1,1,1);
+}

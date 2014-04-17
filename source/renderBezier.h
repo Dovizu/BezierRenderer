@@ -18,4 +18,6 @@ typedef struct {
     int *indices;
 } RasterMesh;
 
+GLuint loadShaderFromFile( std::string path, GLenum shaderType );
+
 #endif /* defined(__BezierSurfaceRenderer__renderBezier__) */

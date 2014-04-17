@@ -132,54 +132,83 @@ void transformUniform(GLint& uniTrans, GLint& uniTransIT, Transform3fAffine& tra
     glUniformMatrix4fv(uniTransIT, 1, GL_FALSE, trans.matrix().inverse().transpose().data());
 }
 
-/*
- Reference:
- typedef struct {
- size_t numOfVertices;
- size_t numOfIndices;
- Vector *vertices;
- int *indices;
- } Mesh;
- */
-void renderToOpenGL(vector<RasterMesh> meshes) {
-    // Shader sources
-    const GLchar* vertexSource =
-    "#version 150 core\n"
-    "in vec3 position;"
-    "in vec3 normal;"
-    "varying vec4 color;"
-    "uniform mat4 trans;"
-    "uniform mat4 trans_it"
-    "struct lightSource"
-    "{"
-    "    vec4 position;"
-    "    vec4 diffuse;"
-    "};"
-    "lightSource light0 = lightSource("
-    "                                 vec4(-1.0, 1.0, -1.0, 0.0),"
-    "                                 vec4(1.0, 1.0, 1.0, 1.0)"
-    "                                 );"
-    "struct material"
-    "{"
-    "    vec4 diffuse;"
-    "};"
-    "material mymaterial = material(vec4(1.0, 0.8, 0.8, 1.0));"
-    
-    "void main() {"
-    "   gl_Position = trans * vec4(position, 1.0);"
-    "    vec3 normalDirection = normalize(trans_it * normal);"
-    "    vec3 lightDirection = normalize(vec3(light0.position));"
-    "    vec3 diffuseReflection = vec3(light0.diffuse) * vec3(mymaterial.diffuse) * max(0.0,dot(normalDirection, lightDirection));"
-    "    color = vec4(diffuseReflection, 1.0);"
-    "}";
+void printShaderLog( GLuint shader )
+{
+	//Make sure name is shader
+	if( glIsShader( shader ) )
+	{
+		//Shader log length
+		int infoLogLength = 0;
+		int maxLength = infoLogLength;
+        
+		//Get info string length
+		glGetShaderiv( shader, GL_INFO_LOG_LENGTH, &maxLength );
+        
+		//Allocate string
+		char* infoLog = new char[ maxLength ];
+        
+		//Get info log
+		glGetShaderInfoLog( shader, maxLength, &infoLogLength, infoLog );
+		if( infoLogLength > 0 )
+		{
+			//Print Log
+			printf( "%s\n", infoLog );
+		}
+        
+		//Deallocate string
+		delete[] infoLog;
+	}
+	else
+	{
+		printf( "Name %d is not a shader\n", shader );
+	}
+}
 
+GLuint loadShaderFromFile( std::string path, GLenum shaderType )
+{
+	//Open file
+	GLuint shaderID = 0;
+	std::string shaderString;
+	std::ifstream sourceFile( path.c_str() );
     
-    const GLchar* fragmentSource =
-    "#version 150 core\n"
-    "varying vec4 color;"
-    "void main() {"
-    "   gl_FragColor = color;"
-    "}";
+	//Source file loaded
+	if( sourceFile )
+	{
+	    //Get shader source
+		shaderString.assign( ( std::istreambuf_iterator< char >( sourceFile ) ), std::istreambuf_iterator< char >() );
+        
+		//Create shader ID
+		shaderID = glCreateShader( shaderType );
+        
+        //Set shader source
+        const GLchar* shaderSource = shaderString.c_str();
+        glShaderSource( shaderID, 1, (const GLchar**)&shaderSource, NULL );
+        
+        //Compile shader source
+        glCompileShader( shaderID );
+        
+        //Check shader for errors
+        GLint shaderCompiled = GL_FALSE;
+        glGetShaderiv( shaderID, GL_COMPILE_STATUS, &shaderCompiled );
+        if( shaderCompiled != GL_TRUE )
+        {
+            printf( "Unable to compile shader %d!\n\nSource:\n%s\n", shaderID, shaderSource );
+            printShaderLog( shaderID );
+            glDeleteShader( shaderID );
+            shaderID = 0;
+            exit(-1);
+        }
+	}
+    else
+    {
+        printf( "Unable to open file %s\n", path.c_str() );
+    }
+    
+	return shaderID;
+}
+
+void renderToOpenGL(vector<RasterMesh> meshes) {
+    RasterMesh mesh = meshes.at(0); //single support only
     
     if (!glfwInit()) {
         cerr << "GLFW cannot initialize" << endl;
@@ -200,57 +229,33 @@ void renderToOpenGL(vector<RasterMesh> meshes) {
         return;
     }
     glfwMakeContextCurrent(window);
-    
     glewExperimental = GL_TRUE;
     if (glewInit() != GLEW_OK) {
         cerr << "GLEW cannot initialize" << endl;
         return;
     }
     
-    GLint compile_ok = GL_FALSE, link_ok = GL_FALSE;
-    
-    // Create and compile the vertex shader
-    GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexSource, NULL);
-    glCompileShader(vertexShader);
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &compile_ok);
-    if (!compile_ok) {
-        fprintf(stderr, "Error in fragment shader\n");
-        exit(-1);
-    }
-    
-    // Create and compile the fragment shader
-    GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentSource, NULL);
-    glCompileShader(fragmentShader);
-    
     // Link the vertex and fragment shader into a shader program
     GLuint shaderProgram = glCreateProgram();
+    // Create and compile the vertex shader & fragment shader
+    GLuint vertexShader = loadShaderFromFile("source/vertexShader.glvs", GL_VERTEX_SHADER);
+    GLuint fragmentShader = loadShaderFromFile("source/fragShader.glfs", GL_FRAGMENT_SHADER);
     glAttachShader(shaderProgram, vertexShader);
     glAttachShader(shaderProgram, fragmentShader);
-    glBindFragDataLocation(shaderProgram, 0, "color");
+    glBindFragDataLocation(shaderProgram, 0, "colorOut");
     glLinkProgram(shaderProgram);
     glUseProgram(shaderProgram);
     
-    // Uniform Transformation
-    Transform3fAffine trans(Translation3f(0,1,-3.5));
-    trans = trans*Transform3fAffine(AngleAxisf(0.25*M_PI, Vector3f::UnitX()));
-//    GLint uniColor = glGetUniformLocation(shaderProgram, "Color");
-//    glUniform3f(uniColor, 0.5f, 0.5f, 0.5f);
+    Transform3fAffine trans = IdentityTransform();
     GLint uniTrans = glGetUniformLocation(shaderProgram, "trans");
-    glUniformMatrix4fv(uniTrans, 1, GL_FALSE, trans.matrix().data());
-    
     GLint uniTransIT = glGetUniformLocation(shaderProgram, "trans_it");
-    glUniformMatrix4fv(uniTrans, 1, GL_FALSE, trans.matrix().inverse().transpose().data());
-    
-    RasterMesh mesh = meshes.at(0);
+    transformUniform(uniTrans, uniTransIT, trans);
+
     /* Create 3D Buffer */
-    
     // Create Vertex Array Object
     GLuint vao;
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
-    
     // Create a Vertex Buffer Object and copy the vertex data to it
     GLuint vbo;
     glGenBuffers(1, &vbo);
@@ -300,8 +305,6 @@ void renderToOpenGL(vector<RasterMesh> meshes) {
         glDrawElements(drawingMode, mesh.numOfIndices, GL_UNSIGNED_INT, 0);
         
         glfwSwapBuffers(window);
-        
-        cout << glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) << endl;
         //hanldes ESC quit
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
             glfwSetWindowShouldClose(window, GL_TRUE);

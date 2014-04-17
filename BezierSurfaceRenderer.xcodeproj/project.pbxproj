@@ -349,6 +349,8 @@
 		F196DF9218EFE88F00DB8DD2 /* UniformTessellation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UniformTessellation.h; sourceTree = "<group>"; };
 		F196DF9318EFF08100DB8DD2 /* Tessellation.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Tessellation.cpp; sourceTree = "<group>"; };
 		F196DF9418EFF08100DB8DD2 /* Tessellation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Tessellation.h; sourceTree = "<group>"; };
+		F19A76F518FF2380000F6DAE /* vertexShader.glvs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = vertexShader.glvs; sourceTree = "<group>"; };
+		F19A76F618FF257F000F6DAE /* fragShader.glfs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = fragShader.glfs; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -1021,6 +1023,8 @@
 			children = (
 				F154BFB218EE8F4F0083974A /* renderBezier.h */,
 				F154BFB118EE8F4F0083974A /* renderBezier.cpp */,
+				F19A76F618FF257F000F6DAE /* fragShader.glfs */,
+				F19A76F518FF2380000F6DAE /* vertexShader.glvs */,
 				F196DF9518EFF3D100DB8DD2 /* Tessellation */,
 				F154BFB818EE958F0083974A /* BEZParser.h */,
 				F154BFB718EE958F0083974A /* BEZParser.cpp */,

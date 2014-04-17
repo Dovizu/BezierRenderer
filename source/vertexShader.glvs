@@ -1,0 +1,26 @@
+#version 410
+
+in vec3 position;  // position of the vertex (and fragment) in world space
+in vec3 normal;  // surface normal vector in world space
+
+uniform mat4 trans;
+uniform mat4 trans_it;
+
+vec3 l_pos = vec3(10, 10, 10);
+
+out VertexData {
+    vec3 normal;
+    vec3 eye;
+    vec3 lightDir;
+} VertexOut;
+
+void main()
+{
+    vec4 pos = trans * vec4(position, 1.0);
+
+    VertexOut.normal = normalize(vec3(trans_it * vec4(normal, 0.0)));
+    VertexOut.lightDir = l_pos - vec3(pos);
+	VertexOut.eye = vec3(0, 0, 0);
+    
+    gl_Position = pos;
+}
