@@ -52,6 +52,7 @@ void UniformTessellation::tessellate(vector<BezierObject>& bezierObjects, vector
                     indices[k+0] = p + (divs+1)*(j+0) + (i+0); //left bottom
                     indices[k+1] = p + (divs+1)*(j+1) + (i+0); //right bottom
                     indices[k+2] = p + (divs+1)*(j+1) + (i+1); //right top
+                
                     //triangle 2
                     indices[k+3] = p + (divs+1)*(j+0) + (i+0); //left bottom
                     indices[k+4] = p + (divs+1)*(j+1) + (i+1); //right top
@@ -102,12 +103,12 @@ Vector UniformTessellation::evaluateSurfaceNormal(const Vector *controlPoints,
                                                   const float &v)
 {
     Vector partialU[4];
-    Vector partialV[4];
+    Vector uCurve[4];
     
     for (int i = 0; i < 4; ++i) partialU[i] = evaluateTangent(controlPoints + 4 * i, u);
-    for (int i = 0; i < 4; ++i) partialV[i] = evaluateTangent(controlPoints + 4 * i, v);
+    for (int i = 0; i < 4; ++i) uCurve[i] = evaluateBezierCurve(controlPoints + 4 * i, u);
     
-    return (evaluateBezierCurve(partialU, v).cross(evaluateBezierCurve(partialV, u))).normalized();
+    return (evaluateBezierCurve(partialU, v).cross(evaluateTangent(uCurve, v))).normalized();
 }
 
 Vector UniformTessellation::evaluateTangent(const Vector *ctrPts, const float &t) {

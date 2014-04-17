@@ -18,6 +18,19 @@ void renderToOpenGL(vector<RasterMesh> meshes);
 void renderToOldOpenGL(int argc, char *argv[]);
 
 vector<RasterMesh> rasterMeshes;
+bool keyStates[256] = {false}; // Create an array of boolean values of length 256 (0-255)
+
+bool movingUp = false; // Whether or not we are moving up or down
+float xLocation = 0.0f;
+float yLocation = 0.0f; // Keep track of our position on the y axis.
+
+float xRotationAngle = 0.0f;
+float yRotationAngle = 0.0f; // The angle of rotation for our object
+
+bool shadeToggle = false;
+int shadeMode = 0; //0 is smooth, 1 is flat
+bool fillToggle = false;
+bool fillMode = 0; //0 is filled, 1 is wireframe
 
 int main(int argc, char *argv[]) {
     vector<CmdLineOptResult> *results;
@@ -98,7 +111,7 @@ void rasterizeMeshes(vector<Mesh>& meshes, vector<RasterMesh>& rasters) {
         if (mesh.type == UniformMesh) {
             RasterMesh raster;
             float *newVertices = new float[mesh.numOfVertices*3];
-            for (int vertex=0; vertex < mesh.numOfIndices; vertex++) {
+            for (int vertex=0; vertex < mesh.numOfVertices; vertex++) {
                 newVertices[vertex*3+0] = mesh.vertices[vertex](0);
                 newVertices[vertex*3+1] = mesh.vertices[vertex](1);
                 newVertices[vertex*3+2] = mesh.vertices[vertex](2);
@@ -141,15 +154,58 @@ void rasterizeMeshes(vector<Mesh>& meshes, vector<RasterMesh>& rasters) {
 
 
 
-
-bool* keyStates = new bool[256]; // Create an array of boolean values of length 256 (0-255)
 void keyOperations (void) {
     if (keyStates[GLUT_KEY_LEFT]) { // If the left arrow key has been pressed
         // Perform left arrow key operations
+        yRotationAngle += 1.0f;
     }  
 }
+
+void SpecialInput(int key, int x, int y)
+{
+    int mod;
+    switch(key)
+    {
+        case GLUT_KEY_UP:
+            mod = glutGetModifiers();
+            if (mod == GLUT_ACTIVE_SHIFT)
+                yLocation += 0.05f;
+            else
+                xRotationAngle -= 1.0f;
+            break;
+        case GLUT_KEY_DOWN:
+            mod = glutGetModifiers();
+            if (mod == GLUT_ACTIVE_SHIFT)
+                yLocation -= 0.05f;
+            else
+                xRotationAngle += 1.0f;
+            break;
+        case GLUT_KEY_LEFT:
+            mod = glutGetModifiers();
+            if (mod == GLUT_ACTIVE_SHIFT)
+                xLocation -= 0.05f;
+            else
+                yRotationAngle -= 1.0f;
+            break;
+        case GLUT_KEY_RIGHT:
+            mod = glutGetModifiers();
+            if (mod == GLUT_ACTIVE_SHIFT)
+                xLocation += 0.05f;
+            else
+                yRotationAngle += 1.0f;
+            break;
+    }
+}
+
+
 void keyPressed (unsigned char key, int x, int y) {
     keyStates[key] = true; // Set the state of the current key to pressed
+    if (key == 's'){
+        shadeToggle = true;
+    }
+    if (key == 'w'){
+        fillToggle = true;
+    }
 }
 void keyUp (unsigned char key, int x, int y) {
     keyStates[key] = false; // Set the state of the current key to not pressed
@@ -166,29 +222,37 @@ void reshape (int width, int height) {
 void renderMesh() {
     
     RasterMesh rasterMesh = rasterMeshes[0];
-    for (int v = 0; v < rasterMesh.numOfVertices; v+=18) {
-        glBegin(GL_TRIANGLES);
-//        glNormal3f(rasterMesh.vertices[v+3],
-//                   rasterMesh.vertices[v+4],
-//                   rasterMesh.vertices[v+5]);
-        glVertex3f(rasterMesh.vertices[v+0],
-                   rasterMesh.vertices[v+1],
-                   rasterMesh.vertices[v+2]);
-//        glNormal3f(rasterMesh.vertices[v+9],
-//                   rasterMesh.vertices[v+10],
-//                   rasterMesh.vertices[v+11]);
-        glVertex3f(rasterMesh.vertices[v+6],
-                   rasterMesh.vertices[v+7],
-                   rasterMesh.vertices[v+8]);
-//        glNormal3f(rasterMesh.vertices[v+15],
-//                   rasterMesh.vertices[v+16],
-//                   rasterMesh.vertices[v+17]);
-        glVertex3f(rasterMesh.vertices[v+12],
-                   rasterMesh.vertices[v+13],
-                   rasterMesh.vertices[v+14]);
+    //glBegin(GL_TRIANGLES);
+    for (int v = 0; v < rasterMesh.numOfIndices; v+=6) {
+        glBegin(GL_QUADS);
+        glNormal3f(rasterMesh.vertices[6*rasterMesh.indices[v]+3],
+                   rasterMesh.vertices[6*rasterMesh.indices[v]+4],
+                   rasterMesh.vertices[6*rasterMesh.indices[v]+5]);
+        glVertex3f(rasterMesh.vertices[6*rasterMesh.indices[v]+0],
+                   rasterMesh.vertices[6*rasterMesh.indices[v]+1],
+                   rasterMesh.vertices[6*rasterMesh.indices[v]+2]);
+        glNormal3f(rasterMesh.vertices[6*rasterMesh.indices[v+1]+3],
+                   rasterMesh.vertices[6*rasterMesh.indices[v+1]+4],
+                   rasterMesh.vertices[6*rasterMesh.indices[v+1]+5]);
+        glVertex3f(rasterMesh.vertices[6*rasterMesh.indices[v+1]+0],
+                   rasterMesh.vertices[6*rasterMesh.indices[v+1]+1],
+                   rasterMesh.vertices[6*rasterMesh.indices[v+1]+2]);
+        glNormal3f(rasterMesh.vertices[6*rasterMesh.indices[v+2]+3],
+                   rasterMesh.vertices[6*rasterMesh.indices[v+2]+4],
+                   rasterMesh.vertices[6*rasterMesh.indices[v+2]+5]);
+        glVertex3f(rasterMesh.vertices[6*rasterMesh.indices[v+2]+0],
+                   rasterMesh.vertices[6*rasterMesh.indices[v+2]+1],
+                   rasterMesh.vertices[6*rasterMesh.indices[v+2]+2]);
+        glNormal3f(rasterMesh.vertices[6*rasterMesh.indices[v+2]+3],
+                   rasterMesh.vertices[6*rasterMesh.indices[v+5]+4],
+                   rasterMesh.vertices[6*rasterMesh.indices[v+5]+5]);
+        glVertex3f(rasterMesh.vertices[6*rasterMesh.indices[v+5]+0],
+                   rasterMesh.vertices[6*rasterMesh.indices[v+5]+1],
+                   rasterMesh.vertices[6*rasterMesh.indices[v+5]+2]);
 //        glColor3f(1.0, 0.0, 0.0);
         glEnd();
     }
+    //glEnd();
 }
 
 void display (void) {
@@ -196,7 +260,7 @@ void display (void) {
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
     
-    GLfloat DiffuseLight[] = {1, 0, 0}; //set DiffuseLight
+    GLfloat DiffuseLight[] = {1, 1, 1}; //set DiffuseLight
     GLfloat AmbientLight[] = {1, 0, 0}; //set AmbientLight
     GLfloat whiteSpecularLight[] = {1.0, 1.0, 1.0};
     
@@ -208,10 +272,55 @@ void display (void) {
     glLightfv(GL_LIGHT0, GL_SPECULAR, whiteSpecularLight);
 
     gluLookAt (0.0, 0.0, 5.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
-    glTranslatef(0.0f, 0.0f, -10.0f); // Push eveything 5 units back into the scene, otherwise we won't see the primitive
-    glRotatef(90, 1.0, 0.0, 0.0); //rotate on the x axis
+    glTranslatef(0.0f, 0.0f, -5.0f); // Push eveything 5 units back into the scene, otherwise we won't see the primitive
+    
+    glTranslatef(0.0f, yLocation, 0.0f); // Translate our object along the y axis
+    glTranslatef(xLocation, 0.0f, 0.0f); // Translate our object along the x axis
+//    glRotatef(-90, 1.0, 0.0, 0.0); //rotate on the x axis
+    glRotatef(xRotationAngle, 1.0f, 0.0f, 0.0f); // Rotate our object around the y axis
+    glRotatef(yRotationAngle, 0.0f, 1.0f, 0.0f); // Rotate our object around the y axis
+    
     renderMesh();
     glutSwapBuffers(); // Flush the OpenGL buffers to the window
+    
+    if (shadeToggle) {
+        if (shadeMode == 0) {
+            shadeMode = 1;
+            glShadeModel(GL_FLAT);
+        }
+        else {
+            shadeMode = 0;
+            glShadeModel(GL_SMOOTH);
+        }
+        shadeToggle = false;
+    }
+    if (fillToggle) {
+        if (fillMode == 0) {
+            fillMode = 1;
+            glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+        }
+        else {
+            fillMode = 1;
+            glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+        }
+        fillToggle = false;
+    }
+
+    
+//    if (movingUp) // If we are moving up
+//        yLocation -= 0.005f; // Move up along our yLocation
+//    else  // Otherwise
+//        yLocation += 0.005f; // Move down along our yLocation
+//    
+//    if (yLocation < -3.0f) // If we have gone up too far
+//        movingUp = false; // Reverse our direction so we are moving down
+//    else if (yLocation > 3.0f) // Else if we have gone down too far
+//        movingUp = true; // Reverse our direction so we are moving up
+//    
+//    yRotationAngle += 0.005f; // Increment our rotation value
+//    
+//    if (yRotationAngle > 360.0f) // If we have rotated beyond 360 degrees (a full rotation)
+//        yRotationAngle -= 360.0f; // Subtract 360 degrees off of our rotation
 }
 
 void renderToOldOpenGL(int argc, char *argv[]) {
@@ -232,8 +341,59 @@ void renderToOldOpenGL(int argc, char *argv[]) {
     glutIdleFunc (display);
     glutReshapeFunc(reshape); // Tell GLUT to use the method "reshape" for reshaping
     
+    glutKeyboardFunc(keyPressed); // Tell GLUT to use the method "keyPressed" for key presses
+    glutKeyboardUpFunc(keyUp); // Tell GLUT to use the method "keyUp" for key up events
+    glutSpecialFunc(SpecialInput);
+    
     glutMainLoop(); // Enter GLUT's main loop
 }
+
+//void specialkeyboard(int key, int x, int y)
+//{
+//    float _movestep = 0.1;
+//    const GLdouble *_matrix;
+//    glGetDoublev(GL_MODELVIEW_MATRIX,_matrix);
+//    switch(key)
+//    {
+//        case GLUT_KEY_LEFT:
+//        {
+//            glLoadIdentity();
+//            glTranslatef(0-_movestep ,0,0);
+//            glMultMatrixd(_matrix);
+//            _dragPosX -= 0-_movestep;
+//            break;
+//        }
+//        case GLUT_KEY_UP:
+//        {
+//            glLoadIdentity();
+//            glTranslatef(0,_movestep,0);
+//            glMultMatrixd(_matrix);
+//            _dragPosY += _movestep;
+//            break;
+//        }
+//        case GLUT_KEY_RIGHT:
+//        {
+//            glLoadIdentity();
+//            glTranslatef(_movestep ,0,0);
+//            glMultMatrixd(_matrix);
+//            _dragPosX += _movestep;
+//            break;
+//        }
+//        case GLUT_KEY_DOWN:
+//        {
+//            glLoadIdentity();
+//            glTranslatef(0,0-_movestep,0);
+//            glMultMatrixd(_matrix);
+//            _dragPosY -= 0-_movestep;
+//            break;
+//        }
+//        default: break;
+//    }
+//    //--refresh the model matrix and its inversed version
+//    getMatrix();
+//    //--redraw
+//    glutPostRedisplay();
+//}
 
 void renderToOpenGL(vector<RasterMesh> meshes) {
     // Shader sources
@@ -257,6 +417,7 @@ void renderToOpenGL(vector<RasterMesh> meshes) {
         cerr << "GLFW cannot initialize" << endl;
         return;
     }
+    
     
     //Only version 3.2 and up
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
