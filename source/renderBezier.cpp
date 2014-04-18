@@ -220,27 +220,34 @@ void renderMesh() {
     int increment = adaptive ? 3 : 6;
     
     RasterMesh rasterMesh = rasterMeshes[0];
-    for (int v = 0; v < rasterMesh.numOfVertices; v+=18) {
-        glBegin(GL_TRIANGLES);
-        glNormal3f(rasterMesh.vertices[v+3],
-                   rasterMesh.vertices[v+4],
-                   rasterMesh.vertices[v+5]);
-        glVertex3f(rasterMesh.vertices[v+0],
-                   rasterMesh.vertices[v+1],
-                   rasterMesh.vertices[v+2]);
-        glNormal3f(rasterMesh.vertices[v+9],
-                   rasterMesh.vertices[v+10],
-                   rasterMesh.vertices[v+11]);
-        glVertex3f(rasterMesh.vertices[v+6],
-                   rasterMesh.vertices[v+7],
-                   rasterMesh.vertices[v+8]);
-        glNormal3f(rasterMesh.vertices[v+15],
-                   rasterMesh.vertices[v+16],
-                   rasterMesh.vertices[v+17]);
-        glVertex3f(rasterMesh.vertices[v+12],
-                   rasterMesh.vertices[v+13],
-                   rasterMesh.vertices[v+14]);
-//        glColor3f(1.0, 0.0, 0.0);
+    for (int v = 0; v < rasterMesh.numOfIndices; v += increment) {
+        glBegin(drawingMode);
+        glNormal3f(rasterMesh.vertices[6*rasterMesh.indices[v]+3],
+                   rasterMesh.vertices[6*rasterMesh.indices[v]+4],
+                   rasterMesh.vertices[6*rasterMesh.indices[v]+5]);
+        glVertex3f(rasterMesh.vertices[6*rasterMesh.indices[v]+0],
+                   rasterMesh.vertices[6*rasterMesh.indices[v]+1],
+                   rasterMesh.vertices[6*rasterMesh.indices[v]+2]);
+        glNormal3f(rasterMesh.vertices[6*rasterMesh.indices[v+1]+3],
+                   rasterMesh.vertices[6*rasterMesh.indices[v+1]+4],
+                   rasterMesh.vertices[6*rasterMesh.indices[v+1]+5]);
+        glVertex3f(rasterMesh.vertices[6*rasterMesh.indices[v+1]+0],
+                   rasterMesh.vertices[6*rasterMesh.indices[v+1]+1],
+                   rasterMesh.vertices[6*rasterMesh.indices[v+1]+2]);
+        glNormal3f(rasterMesh.vertices[6*rasterMesh.indices[v+2]+3],
+                   rasterMesh.vertices[6*rasterMesh.indices[v+2]+4],
+                   rasterMesh.vertices[6*rasterMesh.indices[v+2]+5]);
+        glVertex3f(rasterMesh.vertices[6*rasterMesh.indices[v+2]+0],
+                   rasterMesh.vertices[6*rasterMesh.indices[v+2]+1],
+                   rasterMesh.vertices[6*rasterMesh.indices[v+2]+2]);
+        if (!adaptive) {
+            glNormal3f(rasterMesh.vertices[6*rasterMesh.indices[v+5]+3],
+                       rasterMesh.vertices[6*rasterMesh.indices[v+5]+4],
+                       rasterMesh.vertices[6*rasterMesh.indices[v+5]+5]);
+            glVertex3f(rasterMesh.vertices[6*rasterMesh.indices[v+5]+0],
+                       rasterMesh.vertices[6*rasterMesh.indices[v+5]+1],
+                       rasterMesh.vertices[6*rasterMesh.indices[v+5]+2]);
+        }
         glEnd();
     }
 }
