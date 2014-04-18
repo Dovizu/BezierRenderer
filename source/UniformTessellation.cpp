@@ -59,7 +59,7 @@ void UniformTessellation::tessellate(vector<BezierObject>& bezierObjects, vector
                     indices[k+5] = p + (divs+1)*(j+0) + (i+1); //left top
                     k += 6;
                     numberOfIndicies+=6;
-                    /*
+                    /* for debugging
                      if (indices[k+0] > biggestIndex) {
                      biggestIndex = indices[k+0];
                      }
@@ -80,45 +80,4 @@ void UniformTessellation::tessellate(vector<BezierObject>& bezierObjects, vector
         meshes.push_back(mesh);
         //printf("Biggest Index: %d\n", biggestIndex);
     }
-}
-
-Vector UniformTessellation::evaluateBezierCurve(const Vector *ctrPts, const float &t) {
-    float b0 = (1 - t) * (1 - t) * (1 - t);
-    float b1 = 3 * t * (1 - t) * (1 - t);
-    float b2 = 3 * t * t * (1 - t);
-    float b3 = t * t * t;
-    return ctrPts[0] * b0 + ctrPts[1] * b1 + ctrPts[2] * b2 + ctrPts[3] * b3;
-}
-
-Vector UniformTessellation::evaluateBezierPatch(const Vector *controlPoints,
-                                                const float &u,
-                                                const float &v) {
-    Vector uCurve[4];
-    for (int i = 0; i < 4; ++i) uCurve[i] = evaluateBezierCurve(controlPoints + 4 * i, u);
-    return evaluateBezierCurve(uCurve, v);
-}
-
-Vector UniformTessellation::evaluateSurfaceNormal(const Vector *controlPoints,
-                                                   const float &u,
-                                                   const float &v)
-{
-    Vector partialU[4];
-    Vector uCurve[4];
-    Vector normal;
-    float newU = u, newV = v;
-    do {
-        for (int i = 0; i < 4; ++i) partialU[i] = evaluateTangent(controlPoints + 4 * i, newU);
-        for (int i = 0; i < 4; ++i) uCurve[i] = evaluateBezierCurve(controlPoints + 4 * i, newU);
-        newU+=0.01; newV+=0.01;
-        normal = (evaluateBezierCurve(partialU, newV).cross(evaluateTangent(uCurve, newV))).normalized();
-    } while (normal.norm() <= 0.1);
-    return normal.normalized();
-}
-
-Vector UniformTessellation::evaluateTangent(const Vector *ctrPts, const float &t) {
-    float b0 = -3 * (1 - t) * (1 - t);
-    float b1 = 3 * (1 - t) * (1 - t) - 6 * t * (1 - t);
-    float b2 = 6 * t * (1 - t) - 3 * t * t;
-    float b3 = 3 * t * t;
-    return ctrPts[0] * b0 + ctrPts[1] * b1 + ctrPts[2] * b2 + ctrPts[3] * b3;
 }
