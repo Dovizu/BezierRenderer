@@ -48,7 +48,7 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "-d bezFiles/ 0.05"
+            argument = "-d bezFiles/ 0.01 -a"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
