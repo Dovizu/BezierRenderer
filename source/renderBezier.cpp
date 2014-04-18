@@ -100,6 +100,7 @@ int main(int argc, char *argv[]) {
         //render mesh openGL
         rasterizeMeshes(meshes, rasterMeshes);
         renderToOldOpenGL(argc, argv);
+//        renderToOpenGL(rasterMeshes);
     }
     return 0;
 }
@@ -124,7 +125,6 @@ void rasterizeMeshes(vector<Mesh>& meshes, vector<RasterMesh>& rasters) {
         }else if (mesh.type == AdaptiveMesh){
             RasterMesh raster;
             float *newVertices = new float[mesh.numOfVertices*3];
-            int *newIndices = new int[mesh.numOfIndices];
             for (int vertex=0; vertex < mesh.numOfVertices; vertex++) {
                 newVertices[vertex*3+0] = mesh.adaptiveVertices->at(vertex)(0);
                 newVertices[vertex*3+1] = mesh.adaptiveVertices->at(vertex)(1);
@@ -132,7 +132,7 @@ void rasterizeMeshes(vector<Mesh>& meshes, vector<RasterMesh>& rasters) {
             }
             delete mesh.adaptiveVertices;
             raster.vertices = newVertices;
-            raster.indices = newIndices;
+            raster.indices = mesh.indices;
             raster.numOfIndices = mesh.numOfIndices;
             raster.numOfVertices = mesh.numOfVertices*3;
             rasters.push_back(raster);
@@ -188,6 +188,7 @@ void keyPressed (unsigned char key, int x, int y) {
             break;
         case 'w':
             fillToggle = true;
+            break;
         case 27: // Escape key to exit
             exit(0);
             break;
@@ -306,22 +307,6 @@ void display (void) {
         }
         fillToggle = false;
     }
-
-    
-//    if (movingUp) // If we are moving up
-//        yLocation -= 0.005f; // Move up along our yLocation
-//    else  // Otherwise
-//        yLocation += 0.005f; // Move down along our yLocation
-//    
-//    if (yLocation < -3.0f) // If we have gone up too far
-//        movingUp = false; // Reverse our direction so we are moving down
-//    else if (yLocation > 3.0f) // Else if we have gone down too far
-//        movingUp = true; // Reverse our direction so we are moving up
-//    
-//    yRotationAngle += 0.005f; // Increment our rotation value
-//    
-//    if (yRotationAngle > 360.0f) // If we have rotated beyond 360 degrees (a full rotation)
-//        yRotationAngle -= 360.0f; // Subtract 360 degrees off of our rotation
 }
 
 void renderToOldOpenGL(int argc, char *argv[]) {

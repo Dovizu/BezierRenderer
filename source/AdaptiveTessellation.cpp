@@ -40,8 +40,8 @@ void AdaptiveTessellation::tessellate(vector<BezierObject>& bezierObjects,
         }
         //calculate indices (dummies)
         mesh.indices = new int[mesh.numOfIndices];
-        for (int index=1; index<=mesh.numOfIndices; index++) {
-            mesh.indices[index-1] = index;
+        for (int index=0; index < mesh.numOfIndices; index++) {
+            mesh.indices[index] = index;
         }
         meshes.push_back(mesh);
     }
