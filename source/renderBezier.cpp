@@ -179,7 +179,6 @@ void specialKeyPressed(int key, int x, int y)
     }
 }
 
-
 void keyPressed (unsigned char key, int x, int y) {
     keyStates[key] = true; // Set the state of the current key to pressed
     //for toggling between different modes
@@ -189,9 +188,15 @@ void keyPressed (unsigned char key, int x, int y) {
             break;
         case 'w':
             fillToggle = true;
-
         case 27: // Escape key to exit
             exit(0);
+            break;
+        case '-':
+            gTrans = Transform3fAffine(Translation3f(0,0,-0.09))*gTrans;
+            break;
+        case '=':
+        case '+':
+            gTrans = Transform3fAffine(Translation3f(0,0,0.09))*gTrans;
             break;
         default:
             break;
