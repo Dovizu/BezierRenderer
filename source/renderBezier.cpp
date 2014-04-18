@@ -1,42 +1,16 @@
 //
 //  renderBezier.cpp
 //  BezierSurfaceRenderer
-//
-//  Created by Donny Reynolds on 4/3/14.
 //  Copyright (c) 2014 Leo C & Donny R. All rights reserved.
-//
+
 
 #include "renderBezier.h"
-#include "UnitTest.cpp"
-#include "BEZParser.h"
-#include "Tessellation.h"
-#include "UniformTessellation.h"
-#include "AdaptiveTessellation.h"
-
-void rasterizeMeshes(vector<Mesh>& meshes, vector<RasterMesh>& rasters);
-void renderToOpenGL(vector<RasterMesh> meshes);
-void renderToOldOpenGL(int argc, char *argv[]);
-
-vector<RasterMesh> rasterMeshes;
-vector<Matrix4f> transformations;
-
-bool keyStates[256] = {false}; // Create an array of boolean values of length 256 (0-255)
-
-bool shadeToggle = false;
-ShadeMode shadeMode = SMOOTH; //enum SMOOTH or FLAT
-bool fillToggle = false;
-FillMode fillMode = FILLED; //enum FILLED or WIREFRAME
-bool gTransChanged = false;
-
-bool adaptive = false;
-
-//Global transformation
-//Matrix4f gTrans = Matrix4f::Identity();
-int currentObj = 0;
-#define gTrans transformations.at(currentObj)
-int menuHandle = -1;
-
-//Process command line options and kickstart tessellation and OpenGL
+/*
+ +––––––––––––––––––––––––––––––––––––––+
+ |Main Functions                        |
+ +––––––––––––––––––––––––––––––––––––––+
+ Process command line options and kickstart tessellation and OpenGL
+ */
 int main(int argc, char *argv[]) {
     vector<CmdLineOptResult> *results;
     string basePath;
@@ -48,7 +22,8 @@ int main(int argc, char *argv[]) {
     options.append("-f(2)"); //render file, param
     options.append("-d(2)"); //render directory of files, param
     options.append("-a(0)"); //use adaptive tessellation
-    
+    options.append("--opengl3(0)"); //use OpenGL 3.2 modern pipeline and shader
+
     getCmdLineOptions(argc, argv, options, &results);
     
     float param = 0.0;
@@ -67,6 +42,9 @@ int main(int argc, char *argv[]) {
         }
         if (result.optName.compare("--testAdaptive")==0) {
             testAdaptive();
+        }
+        if (result.optName.compare("--opengl3")==0) {
+            opengl3 = true;
         }
         if (result.optName.compare("-f")==0) {
             fileName = result.args->at(0);
@@ -110,13 +88,15 @@ int main(int argc, char *argv[]) {
             transformations.push_back(Matrix4f::Identity());
         }
         //render using OpenGL
-        renderToOldOpenGL(argc, argv);
-//        renderToOpenGL(rasterMeshes);
+        if (opengl3)
+            renderToOpenGL3(rasterMeshes);
+        else
+            renderToOpenGL(argc, argv);
     }
     return 0;
 }
 
-//Convert mesh Vector arrays to x-y-z arrays
+// Convert mesh Vector arrays to x-y-z arrays
 void rasterizeMeshes(vector<Mesh>& meshes, vector<RasterMesh>& rasters) {
     for (auto & mesh : meshes) {
         if (mesh.type == UniformMesh) {
@@ -151,10 +131,16 @@ void rasterizeMeshes(vector<Mesh>& meshes, vector<RasterMesh>& rasters) {
     }
 }
 
+/*
+ +––––––––––––––––––––––––––––––––––––––+
+ |Menu Event Handling                   |
+ +––––––––––––––––––––––––––––––––––––––+
+ */
+// Function to assign selected object to current obj subject to transformation
 void menuItemPressed(int value) {
     currentObj = value;
 }
-
+//Create menu to allow selective transformation
 void createMenu() {
     menuHandle = glutCreateMenu(menuItemPressed);
     glutSetMenu(menuHandle);
@@ -164,8 +150,14 @@ void createMenu() {
     }
 }
 
-void specialKeyPressed(int key, int x, int y)
-{
+
+/*
++––––––––––––––––––––––––––––––––––––––+
+|Keyboard Event Handling               |
++––––––––––––––––––––––––––––––––––––––+
+*/
+// Keyboard function to handle some special keys for transformations
+void specialKeyPressed(int key, int x, int y) {
     int mod;
     switch(key) {
         case GLUT_KEY_UP:
@@ -202,43 +194,57 @@ void specialKeyPressed(int key, int x, int y)
             break;
     }
 }
-
+// Keyboard function to handle regular keys used for transformations and other commands
 void keyPressed (unsigned char key, int x, int y) {
     keyStates[key] = true; // Set the state of the current key to pressed
     //for toggling between different modes
     switch (key) {
-        case 's':
+        case 's': //toggle between FLAT and SMOOTH shading
             shadeToggle = true;
             break;
-        case 'w':
+        case 'w': //toggle between FILLED and WIREFRAME drawing
             fillToggle = true;
             break;
         case 27: // Escape key to exit
             exit(0);
             break;
-        case '-':
+        case '-': //zoom out
             gTrans = Transform3fAffine(Translation3f(0,0,-0.09))*gTrans;
             break;
-        case '=':
-        case '+':
+        case '=': //zoom in
+        case '+': //zoom in
             gTrans = Transform3fAffine(Translation3f(0,0,0.09))*gTrans;
             break;
         default:
             break;
     }
 }
+// Handles when keyboard keys are released
 void keyUp (unsigned char key, int x, int y) {
     keyStates[key] = false; // Set the state of the current key to not pressed
 }
 
+
+/*
+ +––––––––––––––––––––––––––––––––––––––+
+ |Resize Handling                       |
+ +––––––––––––––––––––––––––––––––––––––+
+ */
 void reshape (int width, int height) {
     glViewport(0, 0, (GLsizei)width, (GLsizei)height); // Set our viewport to the size of our window
     glMatrixMode(GL_PROJECTION); // Switch to the projection matrix so that we can manipulate how our scene is viewed
     glLoadIdentity(); // Reset the projection matrix to the identity matrix so that we don't get any artifacts (cleaning up)
-    gluPerspective(60, (GLfloat)width / (GLfloat)height, 1.0, 100.0); // Set the Field of view angle (in degrees), the aspect ratio of our window, and the new and far planes
+    gluPerspective(60, //Field of view angle (in degrees)
+                   (GLfloat)width / (GLfloat)height, //aspect ratio of our window
+                   1.0, 100.0); // new and far planes
     glMatrixMode(GL_MODELVIEW); // Switch back to the model view matrix, so that we can start drawing shapes correctly
 }
 
+/*
+ +––––––––––––––––––––––––––––––––––––––+
+ |Drawing Module                        |
+ +––––––––––––––––––––––––––––––––––––––+
+ */
 void renderMesh(RasterMesh& rasterMesh) {
     GLenum drawingMode = adaptive ? GL_TRIANGLES : GL_QUADS;
     int increment = adaptive ? 3 : 6;
@@ -275,6 +281,11 @@ void renderMesh(RasterMesh& rasterMesh) {
     }
 }
 
+/*
+ +––––––––––––––––––––––––––––––––––––––+
+ |Display Control                       |
+ +––––––––––––––––––––––––––––––––––––––+
+ */
 void display (void) {
     glClearColor (0.0,0.0,0.0,1.0); //clear the screen to
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -297,6 +308,7 @@ void display (void) {
     
     glTranslatef(0.0f, 0.0f, -5.0f); // Push eveything 5 units back into the scene, otherwise we won't see the primitive
     
+    //loop through all meshes and graph with a different transformation
     for (int meshIdx=0; meshIdx<rasterMeshes.size(); meshIdx++) {
         glPushMatrix();
         
@@ -325,8 +337,7 @@ void display (void) {
         if (shadeMode == SMOOTH) {
             shadeMode = FLAT;
             glShadeModel(GL_FLAT);
-        }
-        else {
+        } else {
             shadeMode = SMOOTH;
             glShadeModel(GL_SMOOTH);
         }
@@ -336,8 +347,7 @@ void display (void) {
         if (fillMode == FILLED) {
             fillMode = WIREFRAME;
             glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-        }
-        else {
+        } else {
             fillMode = FILLED;
             glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
         }
@@ -345,7 +355,12 @@ void display (void) {
     }
 }
 
-void renderToOldOpenGL(int argc, char *argv[]) {
+/*
+ +––––––––––––––––––––––––––––––––––––––+
+ |Main OpenGL                           |
+ +––––––––––––––––––––––––––––––––––––––+
+ */
+void renderToOpenGL(int argc, char *argv[]) {
     glutInit(&argc, argv); // Initialize GLUT
     glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
     glutInitWindowSize (800, 600); // Set the width and height of the window
@@ -373,7 +388,14 @@ void renderToOldOpenGL(int argc, char *argv[]) {
     glutMainLoop(); // Enter GLUT's main loop
 }
 
-void renderToOpenGL(vector<RasterMesh> meshes) {
+/*
+ +––––––––––––––––––––––––––––––––––––––+
+ |New OpenGL                            |
+ +––––––––––––––––––––––––––––––––––––––+
+ Uses modern OpenGL 3.2+ pipleline and custom shading language to shade the teapot.
+ Only supports a blob of color, no Phong shading or light supported.
+  */
+void renderToOpenGL3(vector<RasterMesh>& meshes) {
     // Shader sources
     const GLchar* vertexSource =
     "#version 150 core\n"
@@ -467,7 +489,7 @@ void renderToOpenGL(vector<RasterMesh> meshes) {
     // Specify the layout of the vertex data
     GLint posAttrib = glGetAttribLocation(shaderProgram, "position");
     glEnableVertexAttribArray(posAttrib);
-    glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 6*sizeof(float), 0);
     
     while(!glfwWindowShouldClose(window))
     {
@@ -488,7 +510,6 @@ void renderToOpenGL(vector<RasterMesh> meshes) {
         
         glfwSwapBuffers(window);
         
-        cout << glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) << endl;
         //hanldes ESC quit
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
             glfwSetWindowShouldClose(window, GL_TRUE);
