@@ -48,7 +48,7 @@ void BEZParser::parseDirectory(string dir, vector<BezierObject>& objects) {
 }
 
 void BEZParser::parseFile(string filename, vector<BezierObject>& objects) {
-    const int MAX_CHARS_PER_LINE = 100;
+    const int MAX_CHARS_PER_LINE = 300;
     const int MAX_TOKENS_PER_LINE = 100;
     const char* const DELIMITER = " ";
     

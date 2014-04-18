@@ -49,6 +49,10 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "-d bezFiles/ 0.01 -a"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-f bezFiles/shuttle.bez 0.05"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
