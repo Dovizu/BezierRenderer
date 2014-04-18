@@ -140,7 +140,7 @@ void rasterizeMeshes(vector<Mesh>& meshes, vector<RasterMesh>& rasters) {
     }
 }
 
-void SpecialInput(int key, int x, int y)
+void specialKeyPressed(int key, int x, int y)
 {
     int mod;
     switch(key) {
@@ -335,7 +335,7 @@ void renderToOldOpenGL(int argc, char *argv[]) {
     
     glutKeyboardFunc(keyPressed); // Tell GLUT to use the method "keyPressed" for key presses
     glutKeyboardUpFunc(keyUp); // Tell GLUT to use the method "keyUp" for key up events
-    glutSpecialFunc(SpecialInput);
+    glutSpecialFunc(specialKeyPressed);
     
     glutMainLoop(); // Enter GLUT's main loop
 }
