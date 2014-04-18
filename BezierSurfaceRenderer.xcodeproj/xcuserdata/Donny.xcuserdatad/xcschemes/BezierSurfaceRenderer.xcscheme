@@ -68,6 +68,10 @@
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
+            argument = "-f bezFiles/teapot.bez 0.1"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
             argument = "--testAdaptive"
             isEnabled = "NO">
          </CommandLineArgument>
