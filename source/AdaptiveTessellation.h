@@ -43,7 +43,8 @@ private:
                                   ParametricPoint& B,
                                   ParametricPoint& C,
                                   const Vector *ctrPts,
-                                  Mesh& mesh);    
+                                  Mesh& mesh,
+                                  int depth);
 };
 
 #endif /* defined(__BezierSurfaceRenderer__AdaptiveTessellation__) */

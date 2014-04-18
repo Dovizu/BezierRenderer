@@ -60,8 +60,8 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "-f bezFiles/shuttle.bez 0.1"
-            isEnabled = "NO">
+            argument = "-f bezFiles/shuttle.bez 0.1 -a"
+            isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "-f bezFiles/teapot.bez 0.01 -a"
@@ -69,7 +69,7 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "-f bezFiles/teapot.bez 0.1"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--testAdaptive"
