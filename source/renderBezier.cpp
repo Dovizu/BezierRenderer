@@ -149,7 +149,7 @@ void specialKeyPressed(int key, int x, int y)
             if (mod == GLUT_ACTIVE_SHIFT) {
                 gTrans = Transform3fAffine(Translation3f(0,0.09,0))*gTrans;
             } else {
-                gTrans = Transform3fAffine(AngleAxisf(-M_PI/128,Vector3f::UnitX()))*gTrans;
+                gTrans = gTrans*Transform3fAffine(AngleAxisf(-M_PI/128,Vector3f::UnitX())).matrix();
             }
             break;
         case GLUT_KEY_DOWN:
@@ -157,7 +157,7 @@ void specialKeyPressed(int key, int x, int y)
             if (mod == GLUT_ACTIVE_SHIFT) {
                 gTrans = Transform3fAffine(Translation3f(0,-0.09,0))*gTrans;
             } else {
-                gTrans = Transform3fAffine(AngleAxisf(M_PI/128,Vector3f::UnitX()))*gTrans;
+                gTrans = gTrans*Transform3fAffine(AngleAxisf(M_PI/128,Vector3f::UnitX())).matrix();
             }
             break;
         case GLUT_KEY_LEFT:
@@ -165,7 +165,7 @@ void specialKeyPressed(int key, int x, int y)
             if (mod == GLUT_ACTIVE_SHIFT) {
                 gTrans = Transform3fAffine(Translation3f(-0.09,0,0))*gTrans;
             } else {
-                gTrans = Transform3fAffine(AngleAxisf(-M_PI/128,Vector3f::UnitY()))*gTrans;
+                gTrans = gTrans*Transform3fAffine(AngleAxisf(-M_PI/128,Vector3f::UnitY())).matrix();
             }
             break;
         case GLUT_KEY_RIGHT:
@@ -173,7 +173,7 @@ void specialKeyPressed(int key, int x, int y)
             if (mod == GLUT_ACTIVE_SHIFT) {
                 gTrans = Transform3fAffine(Translation3f(0.09,0,0))*gTrans;
             } else {
-                gTrans = Transform3fAffine(AngleAxisf(M_PI/128,Vector3f::UnitY()))*gTrans;
+                gTrans = gTrans*Transform3fAffine(AngleAxisf(M_PI/128,Vector3f::UnitY())).matrix();
             }
             break;
     }
@@ -271,18 +271,16 @@ void display (void) {
     gluLookAt (0.0, 0.0, 5.0, //eyeX, eyeY, eyeZ
                0.0, 0.0, 0.0, //centerX, centerY, centerZ
                0.0, 1.0, 0.0); //upX, upY, upZ
+    
     glTranslatef(0.0f, 0.0f, -5.0f); // Push eveything 5 units back into the scene, otherwise we won't see the primitive
     
+    glPushMatrix();
+    
     glMultMatrixf(gTrans.data());
-    
-    /* Swapped out for matrix-based transformation
-    glRotatef(xRotationAngle, 1.0f, 0.0f, 0.0f); // Rotate our object around the x axis
-    glRotatef(yRotationAngle, 0.0f, 1.0f, 0.0f); // Rotate our object around the y axis
-    glTranslatef(0.0f, yLocation, 0.0f); // Translate our object along the y axis
-    glTranslatef(xLocation, 0.0f, 0.0f); // Translate our object along the x axis
-     */
-    
     renderMesh();
+    
+    glPopMatrix();
+    
     glutSwapBuffers(); // Flush the OpenGL buffers to the window
     
     if (shadeToggle) {
