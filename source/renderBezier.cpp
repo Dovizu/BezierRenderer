@@ -20,18 +20,16 @@ void renderToOldOpenGL(int argc, char *argv[]);
 vector<RasterMesh> rasterMeshes;
 bool keyStates[256] = {false}; // Create an array of boolean values of length 256 (0-255)
 
-bool movingUp = false; // Whether or not we are moving up or down
-float xLocation = 0.0f;
-float yLocation = 0.0f; // Keep track of our position on the y axis.
-
-float xRotationAngle = 0.0f;
-float yRotationAngle = 0.0f; // The angle of rotation for our object
-
 bool shadeToggle = false;
-int shadeMode = 0; //0 is smooth, 1 is flat
+ShadeMode shadeMode = SMOOTH; //enum SMOOTH or FLAT
 bool fillToggle = false;
-bool fillMode = 0; //0 is filled, 1 is wireframe
+FillMode fillMode = FILLED; //enum FILLED or WIREFRAME
+bool gTransChanged = false;
 
+//Global transformation
+Matrix4f gTrans = Matrix4f::Identity();
+
+//Process command line options and kickstart tessellation and OpenGL
 int main(int argc, char *argv[]) {
     vector<CmdLineOptResult> *results;
     string basePath;
@@ -105,7 +103,7 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
-
+//Convert mesh Vector arrays to x-y-z arrays
 void rasterizeMeshes(vector<Mesh>& meshes, vector<RasterMesh>& rasters) {
     for (auto & mesh : meshes) {
         if (mesh.type == UniformMesh) {
@@ -142,57 +140,41 @@ void rasterizeMeshes(vector<Mesh>& meshes, vector<RasterMesh>& rasters) {
     }
 }
 
-/*
- Reference:
- typedef struct {
- size_t numOfVertices;
- size_t numOfIndices;
- Vector *vertices;
- int *indices;
- } Mesh;
- */
-
-
-
-void keyOperations (void) {
-    if (keyStates[GLUT_KEY_LEFT]) { // If the left arrow key has been pressed
-        // Perform left arrow key operations
-        yRotationAngle += 1.0f;
-    }  
-}
-
 void SpecialInput(int key, int x, int y)
 {
     int mod;
-    switch(key)
-    {
+    switch(key) {
         case GLUT_KEY_UP:
             mod = glutGetModifiers();
-            if (mod == GLUT_ACTIVE_SHIFT)
-                yLocation += 0.05f;
-            else
-                xRotationAngle -= 1.0f;
+            if (mod == GLUT_ACTIVE_SHIFT) {
+                gTrans = Transform3fAffine(Translation3f(0,0.09,0))*gTrans;
+            } else {
+                gTrans = Transform3fAffine(AngleAxisf(-M_PI/128,Vector3f::UnitX()))*gTrans;
+            }
             break;
         case GLUT_KEY_DOWN:
             mod = glutGetModifiers();
-            if (mod == GLUT_ACTIVE_SHIFT)
-                yLocation -= 0.05f;
-            else
-                xRotationAngle += 1.0f;
+            if (mod == GLUT_ACTIVE_SHIFT) {
+                gTrans = Transform3fAffine(Translation3f(0,-0.09,0))*gTrans;
+            } else {
+                gTrans = Transform3fAffine(AngleAxisf(M_PI/128,Vector3f::UnitX()))*gTrans;
+            }
             break;
         case GLUT_KEY_LEFT:
             mod = glutGetModifiers();
-            if (mod == GLUT_ACTIVE_SHIFT)
-                xLocation -= 0.05f;
-            else
-                yRotationAngle -= 1.0f;
+            if (mod == GLUT_ACTIVE_SHIFT) {
+                gTrans = Transform3fAffine(Translation3f(-0.09,0,0))*gTrans;
+            } else {
+                gTrans = Transform3fAffine(AngleAxisf(-M_PI/128,Vector3f::UnitY()))*gTrans;
+            }
             break;
         case GLUT_KEY_RIGHT:
             mod = glutGetModifiers();
-            if (mod == GLUT_ACTIVE_SHIFT)
-                xLocation += 0.05f;
-            else
-                yRotationAngle += 1.0f;
+            if (mod == GLUT_ACTIVE_SHIFT) {
+                gTrans = Transform3fAffine(Translation3f(0.09,0,0))*gTrans;
+            } else {
+                gTrans = Transform3fAffine(AngleAxisf(M_PI/128,Vector3f::UnitY()))*gTrans;
+            }
             break;
     }
 }
@@ -200,11 +182,19 @@ void SpecialInput(int key, int x, int y)
 
 void keyPressed (unsigned char key, int x, int y) {
     keyStates[key] = true; // Set the state of the current key to pressed
-    if (key == 's'){
-        shadeToggle = true;
-    }
-    if (key == 'w'){
-        fillToggle = true;
+    //for toggling between different modes
+    switch (key) {
+        case 's':
+            shadeToggle = true;
+            break;
+        case 'w':
+            fillToggle = true;
+
+        case 27: // Escape key to exit
+            exit(0);
+            break;
+        default:
+            break;
     }
 }
 void keyUp (unsigned char key, int x, int y) {
@@ -222,7 +212,6 @@ void reshape (int width, int height) {
 void renderMesh() {
     
     RasterMesh rasterMesh = rasterMeshes[0];
-    //glBegin(GL_TRIANGLES);
     for (int v = 0; v < rasterMesh.numOfIndices; v+=6) {
         glBegin(GL_QUADS);
         glNormal3f(rasterMesh.vertices[6*rasterMesh.indices[v]+3],
@@ -249,10 +238,8 @@ void renderMesh() {
         glVertex3f(rasterMesh.vertices[6*rasterMesh.indices[v+5]+0],
                    rasterMesh.vertices[6*rasterMesh.indices[v+5]+1],
                    rasterMesh.vertices[6*rasterMesh.indices[v+5]+2]);
-//        glColor3f(1.0, 0.0, 0.0);
         glEnd();
     }
-    //glEnd();
 }
 
 void display (void) {
@@ -271,36 +258,41 @@ void display (void) {
     glLightfv(GL_LIGHT0, GL_POSITION, LightPosition);
     glLightfv(GL_LIGHT0, GL_SPECULAR, whiteSpecularLight);
 
-    gluLookAt (0.0, 0.0, 5.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+    gluLookAt (0.0, 0.0, 5.0, //eyeX, eyeY, eyeZ
+               0.0, 0.0, 0.0, //centerX, centerY, centerZ
+               0.0, 1.0, 0.0); //upX, upY, upZ
     glTranslatef(0.0f, 0.0f, -5.0f); // Push eveything 5 units back into the scene, otherwise we won't see the primitive
     
+    glMultMatrixf(gTrans.data());
+    
+    /* Swapped out for matrix-based transformation
+    glRotatef(xRotationAngle, 1.0f, 0.0f, 0.0f); // Rotate our object around the x axis
+    glRotatef(yRotationAngle, 0.0f, 1.0f, 0.0f); // Rotate our object around the y axis
     glTranslatef(0.0f, yLocation, 0.0f); // Translate our object along the y axis
     glTranslatef(xLocation, 0.0f, 0.0f); // Translate our object along the x axis
-//    glRotatef(-90, 1.0, 0.0, 0.0); //rotate on the x axis
-    glRotatef(xRotationAngle, 1.0f, 0.0f, 0.0f); // Rotate our object around the y axis
-    glRotatef(yRotationAngle, 0.0f, 1.0f, 0.0f); // Rotate our object around the y axis
+     */
     
     renderMesh();
     glutSwapBuffers(); // Flush the OpenGL buffers to the window
     
     if (shadeToggle) {
-        if (shadeMode == 0) {
-            shadeMode = 1;
+        if (shadeMode == SMOOTH) {
+            shadeMode = FLAT;
             glShadeModel(GL_FLAT);
         }
         else {
-            shadeMode = 0;
+            shadeMode = SMOOTH;
             glShadeModel(GL_SMOOTH);
         }
         shadeToggle = false;
     }
     if (fillToggle) {
-        if (fillMode == 0) {
-            fillMode = 1;
+        if (fillMode == FILLED) {
+            fillMode = WIREFRAME;
             glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
         }
         else {
-            fillMode = 1;
+            fillMode = FILLED;
             glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
         }
         fillToggle = false;
