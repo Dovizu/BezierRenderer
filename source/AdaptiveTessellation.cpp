@@ -38,6 +38,11 @@ void AdaptiveTessellation::tessellate(vector<BezierObject>& bezierObjects,
             evaluateAdaptiveTriangle(A,B,C, patchControlPoints, mesh);
             evaluateAdaptiveTriangle(A,C,D, patchControlPoints, mesh);
         }
+        //calculate indices (dummies)
+        mesh.indices = new int[mesh.numOfIndices];
+        for (int index=1; index<=mesh.numOfIndices; index++) {
+            mesh.indices[index-1] = index;
+        }
         meshes.push_back(mesh);
     }
 }
@@ -66,6 +71,10 @@ void AdaptiveTessellation::evaluateAdaptiveTriangle(const ParametricPoint& A,
     Vector v1 = evaluateBezierPatch(ctrPts, A);
     Vector v2 = evaluateBezierPatch(ctrPts, B);
     Vector v3 = evaluateBezierPatch(ctrPts, C);
+    Vector v1norm;
+    Vector v2norm;
+    Vector v3norm;
+    
     //errors on the midpoints on edges
     bool e1, e2, e3;
     ParametricPoint e1pt = (A+C)/2.0;
@@ -75,6 +84,13 @@ void AdaptiveTessellation::evaluateAdaptiveTriangle(const ParametricPoint& A,
     e2 = abs((evaluateBezierPatch(ctrPts, e2pt)-(v1+v2)/2).norm()) > error;
     e3 = abs((evaluateBezierPatch(ctrPts, e3pt)-(v2+v3)/2).norm()) > error;
     unsigned int binary = e1 | e2 << 1 | e3 << 2;
+
+    if (binary == 0b000) {
+        v1norm = evaluateSurfaceNormal(ctrPts, A);
+        v2norm = evaluateSurfaceNormal(ctrPts, B);
+        v3norm = evaluateSurfaceNormal(ctrPts, C);
+    }
+    
     switch (binary) {
         case 0b001: //e1 not flat
             evaluateAdaptiveTriangle(e1pt, B, A, ctrPts, mesh);
@@ -109,10 +125,7 @@ void AdaptiveTessellation::evaluateAdaptiveTriangle(const ParametricPoint& A,
             evaluateAdaptiveTriangle(e1pt, e3pt, e2pt, ctrPts, mesh);
             evaluateAdaptiveTriangle(e1pt, e2pt, A, ctrPts, mesh);
             break;
-        case 0b000: { //all flat
-            Vector v1norm = evaluateSurfaceNormal(ctrPts, A);
-            Vector v2norm = evaluateSurfaceNormal(ctrPts, B);
-            Vector v3norm = evaluateSurfaceNormal(ctrPts, C);
+        case 0b000: //all flat
             mesh.adaptiveVertices->push_back(v1);
             mesh.adaptiveVertices->push_back(v1norm);
             mesh.adaptiveVertices->push_back(v2);
@@ -122,7 +135,6 @@ void AdaptiveTessellation::evaluateAdaptiveTriangle(const ParametricPoint& A,
             mesh.numOfVertices += 6;
             mesh.numOfIndices += 3;
             break;
-            }
         default: //something's wrong
             ASSERT(false, "AdaptiveTessellation encountered unknown value");
             break;

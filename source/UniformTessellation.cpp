@@ -16,17 +16,17 @@ void UniformTessellation::tessellate(vector<BezierObject>& bezierObjects, vector
         size_t numberOfVertices = 0;
         size_t numberOfIndicies = 0;
         
-        size_t numVerticesPerPatch = (divs+1)*(divs+1); //*2 for vertex + normal
+        size_t numVerticesPerPatch = (divs+1)*(divs+1);
         size_t numNormalsPerPatch = (divs+1)*(divs+1);
         size_t numElementsPerPatch = numVerticesPerPatch + numNormalsPerPatch;
         
         size_t numIndiciesPerPatch = divs*divs*6;
         //total list of vertices
-        Vector *vertices = new Vector[numElementsPerPatch*object.numberOfPatches];
+        Vector *vertices = new Vector[numElementsPerPatch * object.numberOfPatches];
         //total list of indices
         int *indices = new int[numIndiciesPerPatch * object.numberOfPatches];
         
-        //calculate fucking Bezier patches, getting all patchy patchy
+        //calculate Bezier patches
         Vector *patchControlPoints;
         for (int currPatch=0; currPatch<object.numberOfPatches; ++currPatch) {
             patchControlPoints = object.controlPoints+currPatch*16;

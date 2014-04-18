@@ -26,6 +26,8 @@ bool fillToggle = false;
 FillMode fillMode = FILLED; //enum FILLED or WIREFRAME
 bool gTransChanged = false;
 
+bool adaptive = false;
+
 //Global transformation
 Matrix4f gTrans = Matrix4f::Identity();
 
@@ -47,7 +49,6 @@ int main(int argc, char *argv[]) {
     float param = 0.0;
     string directoryName;
     string fileName;
-    bool adaptive = false;
     
     for (auto & result : *results) {
         if (result.optName.compare("--testOpenGL")==0) {
@@ -128,7 +129,6 @@ void rasterizeMeshes(vector<Mesh>& meshes, vector<RasterMesh>& rasters) {
                 newVertices[vertex*3+0] = mesh.adaptiveVertices->at(vertex)(0);
                 newVertices[vertex*3+1] = mesh.adaptiveVertices->at(vertex)(1);
                 newVertices[vertex*3+2] = mesh.adaptiveVertices->at(vertex)(2);
-                newIndices[vertex] = vertex;
             }
             delete mesh.adaptiveVertices;
             raster.vertices = newVertices;
@@ -215,10 +215,12 @@ void reshape (int width, int height) {
 }
 
 void renderMesh() {
+    GLenum drawingMode = adaptive ? GL_TRIANGLES : GL_QUADS;
+    int increment = adaptive ? 3 : 6;
     
     RasterMesh rasterMesh = rasterMeshes[0];
-    for (int v = 0; v < rasterMesh.numOfIndices; v+=6) {
-        glBegin(GL_QUADS);
+    for (int v = 0; v < rasterMesh.numOfIndices; v += increment) {
+        glBegin(drawingMode);
         glNormal3f(rasterMesh.vertices[6*rasterMesh.indices[v]+3],
                    rasterMesh.vertices[6*rasterMesh.indices[v]+4],
                    rasterMesh.vertices[6*rasterMesh.indices[v]+5]);
@@ -237,12 +239,14 @@ void renderMesh() {
         glVertex3f(rasterMesh.vertices[6*rasterMesh.indices[v+2]+0],
                    rasterMesh.vertices[6*rasterMesh.indices[v+2]+1],
                    rasterMesh.vertices[6*rasterMesh.indices[v+2]+2]);
-        glNormal3f(rasterMesh.vertices[6*rasterMesh.indices[v+2]+3],
-                   rasterMesh.vertices[6*rasterMesh.indices[v+5]+4],
-                   rasterMesh.vertices[6*rasterMesh.indices[v+5]+5]);
-        glVertex3f(rasterMesh.vertices[6*rasterMesh.indices[v+5]+0],
-                   rasterMesh.vertices[6*rasterMesh.indices[v+5]+1],
-                   rasterMesh.vertices[6*rasterMesh.indices[v+5]+2]);
+        if (!adaptive) {
+            glNormal3f(rasterMesh.vertices[6*rasterMesh.indices[v+5]+3],
+                       rasterMesh.vertices[6*rasterMesh.indices[v+5]+4],
+                       rasterMesh.vertices[6*rasterMesh.indices[v+5]+5]);
+            glVertex3f(rasterMesh.vertices[6*rasterMesh.indices[v+5]+0],
+                       rasterMesh.vertices[6*rasterMesh.indices[v+5]+1],
+                       rasterMesh.vertices[6*rasterMesh.indices[v+5]+2]);
+        }
         glEnd();
     }
 }
