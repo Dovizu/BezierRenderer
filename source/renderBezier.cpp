@@ -281,7 +281,7 @@ void display (void) {
     glLoadIdentity();
     
     GLfloat DiffuseLight[] = {1, 1, 1}; //set DiffuseLight
-    GLfloat AmbientLight[] = {1, 0, 0}; //set AmbientLight
+    GLfloat AmbientLight[] = {0.5, 0.5, 0.5}; //set AmbientLight
     GLfloat whiteSpecularLight[] = {1.0, 1.0, 1.0};
     
     glLightfv(GL_LIGHT0, GL_DIFFUSE, DiffuseLight); //change
@@ -302,13 +302,15 @@ void display (void) {
         
         GLfloat white[] = {0.8f, 0.8f, 0.8f, 1.0f};
         GLfloat cyan[] = {0.f, .8f, .8f, 1.f};
+        GLfloat shininess[] = {80};
+        
         if (meshIdx == currentObj) {
             glMaterialfv(GL_FRONT, GL_DIFFUSE, cyan);
         }else {
             glMaterialfv(GL_FRONT, GL_DIFFUSE, white);
         }
         glMaterialfv(GL_FRONT, GL_SPECULAR, white);
-        GLfloat shininess[] = {50};
+        
         glMaterialfv(GL_FRONT, GL_SHININESS, shininess);
         
         glMultMatrixf(transformations.at(meshIdx).data());
@@ -316,9 +318,9 @@ void display (void) {
         
         glPopMatrix();
     }
-    
+
     glutSwapBuffers(); // Flush the OpenGL buffers to the window
-    
+
     if (shadeToggle) {
         if (shadeMode == SMOOTH) {
             shadeMode = FLAT;

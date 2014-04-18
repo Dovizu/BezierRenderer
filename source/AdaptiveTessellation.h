@@ -45,11 +45,12 @@ private:
                                const float &v);
     Vector evaluateBezierPatch(const Vector *controlPoints,
                                const ParametricPoint& UV);
-    void evaluateAdaptiveTriangle(const ParametricPoint& A,
-                                  const ParametricPoint& B,
-                                  const ParametricPoint& C,
+    void evaluateAdaptiveTriangle(ParametricPoint& A,
+                                  ParametricPoint& B,
+                                  ParametricPoint& C,
                                   const Vector *ctrPts,
-                                  Mesh& mesh);
+                                  Mesh& mesh,
+                                  int depth);
     Vector evaluateSurfaceNormal(const Vector *controlPoints,
                                  const float &u,
                                  const float &v);
