@@ -18,4 +18,14 @@ typedef struct {
     int *indices;
 } RasterMesh;
 
+typedef enum {
+    FLAT,
+    SMOOTH
+} ShadeMode;
+
+typedef enum {
+    FILLED,
+    WIREFRAME
+} FillMode;
+
 #endif /* defined(__BezierSurfaceRenderer__renderBezier__) */

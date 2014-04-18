@@ -38,6 +38,11 @@ void AdaptiveTessellation::tessellate(vector<BezierObject>& bezierObjects,
             evaluateAdaptiveTriangle(A,B,C, patchControlPoints, mesh);
             evaluateAdaptiveTriangle(A,C,D, patchControlPoints, mesh);
         }
+        //calculate indices (dummies)
+        mesh.indices = new int[mesh.numOfIndices];
+        for (int index=0; index < mesh.numOfIndices; index++) {
+            mesh.indices[index] = index;
+        }
         meshes.push_back(mesh);
     }
 }
@@ -66,6 +71,10 @@ void AdaptiveTessellation::evaluateAdaptiveTriangle(const ParametricPoint& A,
     Vector v1 = evaluateBezierPatch(ctrPts, A);
     Vector v2 = evaluateBezierPatch(ctrPts, B);
     Vector v3 = evaluateBezierPatch(ctrPts, C);
+    Vector v1norm;
+    Vector v2norm;
+    Vector v3norm;
+    
     //errors on the midpoints on edges
     bool e1, e2, e3;
     ParametricPoint e1pt = (A+C)/2.0;
@@ -75,6 +84,13 @@ void AdaptiveTessellation::evaluateAdaptiveTriangle(const ParametricPoint& A,
     e2 = abs((evaluateBezierPatch(ctrPts, e2pt)-(v1+v2)/2).norm()) > error;
     e3 = abs((evaluateBezierPatch(ctrPts, e3pt)-(v2+v3)/2).norm()) > error;
     unsigned int binary = e1 | e2 << 1 | e3 << 2;
+
+    if (binary == 0b000) {
+        v1norm = evaluateSurfaceNormal(ctrPts, A);
+        v2norm = evaluateSurfaceNormal(ctrPts, B);
+        v3norm = evaluateSurfaceNormal(ctrPts, C);
+    }
+    
     switch (binary) {
         case 0b001: //e1 not flat
             evaluateAdaptiveTriangle(e1pt, B, A, ctrPts, mesh);
@@ -111,9 +127,12 @@ void AdaptiveTessellation::evaluateAdaptiveTriangle(const ParametricPoint& A,
             break;
         case 0b000: //all flat
             mesh.adaptiveVertices->push_back(v1);
+            mesh.adaptiveVertices->push_back(v1norm);
             mesh.adaptiveVertices->push_back(v2);
+            mesh.adaptiveVertices->push_back(v2norm);
             mesh.adaptiveVertices->push_back(v3);
-            mesh.numOfVertices += 3;
+            mesh.adaptiveVertices->push_back(v3norm);
+            mesh.numOfVertices += 6;
             mesh.numOfIndices += 3;
             break;
         default: //something's wrong
@@ -141,4 +160,31 @@ Vector AdaptiveTessellation::evaluateBezierPatch(const Vector *controlPoints,
 Vector AdaptiveTessellation::evaluateBezierPatch(const Vector *controlPoints,
                                                  const ParametricPoint& UV) {
     return evaluateBezierPatch(controlPoints, UV(0), UV(1));
+}
+
+
+Vector AdaptiveTessellation::evaluateSurfaceNormal(const Vector *controlPoints,
+                                                  const float &u,
+                                                  const float &v)
+{
+    Vector partialU[4];
+    Vector uCurve[4];
+    
+    for (int i = 0; i < 4; ++i) partialU[i] = evaluateTangent(controlPoints + 4 * i, u);
+    for (int i = 0; i < 4; ++i) uCurve[i] = evaluateBezierCurve(controlPoints + 4 * i, u);
+    
+    return (evaluateBezierCurve(partialU, v).cross(evaluateTangent(uCurve, v))).normalized();
+}
+
+Vector AdaptiveTessellation::evaluateTangent(const Vector *ctrPts, const float &t) {
+    float b0 = -3 * (1 - t) * (1 - t);
+    float b1 = 3 * (1 - t) * (1 - t) - 6 * t * (1 - t);
+    float b2 = 6 * t * (1 - t) - 3 * t * t;
+    float b3 = 3 * t * t;
+    return ctrPts[0] * b0 + ctrPts[1] * b1 + ctrPts[2] * b2 + ctrPts[3] * b3;
+}
+
+Vector AdaptiveTessellation::evaluateSurfaceNormal(const Vector *controlPoints,
+                                                   const ParametricPoint& UV) {
+    return evaluateSurfaceNormal(controlPoints, UV(0), UV(1));
 }

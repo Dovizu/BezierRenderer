@@ -18,7 +18,20 @@ void renderToOpenGL(vector<RasterMesh> meshes);
 void renderToOldOpenGL(int argc, char *argv[]);
 
 vector<RasterMesh> rasterMeshes;
+bool keyStates[256] = {false}; // Create an array of boolean values of length 256 (0-255)
 
+bool shadeToggle = false;
+ShadeMode shadeMode = SMOOTH; //enum SMOOTH or FLAT
+bool fillToggle = false;
+FillMode fillMode = FILLED; //enum FILLED or WIREFRAME
+bool gTransChanged = false;
+
+bool adaptive = false;
+
+//Global transformation
+Matrix4f gTrans = Matrix4f::Identity();
+
+//Process command line options and kickstart tessellation and OpenGL
 int main(int argc, char *argv[]) {
     vector<CmdLineOptResult> *results;
     string basePath;
@@ -36,7 +49,6 @@ int main(int argc, char *argv[]) {
     float param = 0.0;
     string directoryName;
     string fileName;
-    bool adaptive = false;
     
     for (auto & result : *results) {
         if (result.optName.compare("--testOpenGL")==0) {
@@ -88,11 +100,12 @@ int main(int argc, char *argv[]) {
         //render mesh openGL
         rasterizeMeshes(meshes, rasterMeshes);
         renderToOldOpenGL(argc, argv);
+//        renderToOpenGL(rasterMeshes);
     }
     return 0;
 }
 
-
+//Convert mesh Vector arrays to x-y-z arrays
 void rasterizeMeshes(vector<Mesh>& meshes, vector<RasterMesh>& rasters) {
     for (auto & mesh : meshes) {
         if (mesh.type == UniformMesh) {
@@ -112,16 +125,14 @@ void rasterizeMeshes(vector<Mesh>& meshes, vector<RasterMesh>& rasters) {
         }else if (mesh.type == AdaptiveMesh){
             RasterMesh raster;
             float *newVertices = new float[mesh.numOfVertices*3];
-            int *newIndices = new int[mesh.numOfIndices];
             for (int vertex=0; vertex < mesh.numOfVertices; vertex++) {
                 newVertices[vertex*3+0] = mesh.adaptiveVertices->at(vertex)(0);
                 newVertices[vertex*3+1] = mesh.adaptiveVertices->at(vertex)(1);
                 newVertices[vertex*3+2] = mesh.adaptiveVertices->at(vertex)(2);
-                newIndices[vertex] = vertex;
             }
             delete mesh.adaptiveVertices;
             raster.vertices = newVertices;
-            raster.indices = newIndices;
+            raster.indices = mesh.indices;
             raster.numOfIndices = mesh.numOfIndices;
             raster.numOfVertices = mesh.numOfVertices*3;
             rasters.push_back(raster);
@@ -129,27 +140,68 @@ void rasterizeMeshes(vector<Mesh>& meshes, vector<RasterMesh>& rasters) {
     }
 }
 
-/*
- Reference:
- typedef struct {
- size_t numOfVertices;
- size_t numOfIndices;
- Vector *vertices;
- int *indices;
- } Mesh;
- */
-
-
-
-
-bool* keyStates = new bool[256]; // Create an array of boolean values of length 256 (0-255)
-void keyOperations (void) {
-    if (keyStates[GLUT_KEY_LEFT]) { // If the left arrow key has been pressed
-        // Perform left arrow key operations
-    }  
+void specialKeyPressed(int key, int x, int y)
+{
+    int mod;
+    switch(key) {
+        case GLUT_KEY_UP:
+            mod = glutGetModifiers();
+            if (mod == GLUT_ACTIVE_SHIFT) {
+                gTrans = Transform3fAffine(Translation3f(0,0.09,0))*gTrans;
+            } else {
+                gTrans = Transform3fAffine(AngleAxisf(-M_PI/128,Vector3f::UnitX()))*gTrans;
+            }
+            break;
+        case GLUT_KEY_DOWN:
+            mod = glutGetModifiers();
+            if (mod == GLUT_ACTIVE_SHIFT) {
+                gTrans = Transform3fAffine(Translation3f(0,-0.09,0))*gTrans;
+            } else {
+                gTrans = Transform3fAffine(AngleAxisf(M_PI/128,Vector3f::UnitX()))*gTrans;
+            }
+            break;
+        case GLUT_KEY_LEFT:
+            mod = glutGetModifiers();
+            if (mod == GLUT_ACTIVE_SHIFT) {
+                gTrans = Transform3fAffine(Translation3f(-0.09,0,0))*gTrans;
+            } else {
+                gTrans = Transform3fAffine(AngleAxisf(-M_PI/128,Vector3f::UnitY()))*gTrans;
+            }
+            break;
+        case GLUT_KEY_RIGHT:
+            mod = glutGetModifiers();
+            if (mod == GLUT_ACTIVE_SHIFT) {
+                gTrans = Transform3fAffine(Translation3f(0.09,0,0))*gTrans;
+            } else {
+                gTrans = Transform3fAffine(AngleAxisf(M_PI/128,Vector3f::UnitY()))*gTrans;
+            }
+            break;
+    }
 }
+
 void keyPressed (unsigned char key, int x, int y) {
     keyStates[key] = true; // Set the state of the current key to pressed
+    //for toggling between different modes
+    switch (key) {
+        case 's':
+            shadeToggle = true;
+            break;
+        case 'w':
+            fillToggle = true;
+            break;
+        case 27: // Escape key to exit
+            exit(0);
+            break;
+        case '-':
+            gTrans = Transform3fAffine(Translation3f(0,0,-0.09))*gTrans;
+            break;
+        case '=':
+        case '+':
+            gTrans = Transform3fAffine(Translation3f(0,0,0.09))*gTrans;
+            break;
+        default:
+            break;
+    }
 }
 void keyUp (unsigned char key, int x, int y) {
     keyStates[key] = false; // Set the state of the current key to not pressed
@@ -164,6 +216,8 @@ void reshape (int width, int height) {
 }
 
 void renderMesh() {
+    GLenum drawingMode = adaptive ? GL_TRIANGLES : GL_QUADS;
+    int increment = adaptive ? 3 : 6;
     
     RasterMesh rasterMesh = rasterMeshes[0];
     for (int v = 0; v < rasterMesh.numOfVertices; v+=18) {
@@ -196,22 +250,56 @@ void display (void) {
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
     
-    GLfloat DiffuseLight[] = {1, 0, 0}; //set DiffuseLight
+    GLfloat DiffuseLight[] = {1, 1, 1}; //set DiffuseLight
     GLfloat AmbientLight[] = {1, 0, 0}; //set AmbientLight
     GLfloat whiteSpecularLight[] = {1.0, 1.0, 1.0};
     
-    glLightfv (GL_LIGHT0, GL_DIFFUSE, DiffuseLight); //change
-    glLightfv (GL_LIGHT1, GL_AMBIENT, AmbientLight); //change
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, DiffuseLight); //change
+    glLightfv(GL_LIGHT1, GL_AMBIENT, AmbientLight); //change
     
     GLfloat LightPosition[] = {0, 0, 1, 0}; //set the
-    glLightfv (GL_LIGHT0, GL_POSITION, LightPosition);
+    glLightfv(GL_LIGHT0, GL_POSITION, LightPosition);
     glLightfv(GL_LIGHT0, GL_SPECULAR, whiteSpecularLight);
 
-    gluLookAt (0.0, 0.0, 5.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
-    glTranslatef(0.0f, 0.0f, -10.0f); // Push eveything 5 units back into the scene, otherwise we won't see the primitive
-    glRotatef(90, 1.0, 0.0, 0.0); //rotate on the x axis
+    gluLookAt (0.0, 0.0, 5.0, //eyeX, eyeY, eyeZ
+               0.0, 0.0, 0.0, //centerX, centerY, centerZ
+               0.0, 1.0, 0.0); //upX, upY, upZ
+    glTranslatef(0.0f, 0.0f, -5.0f); // Push eveything 5 units back into the scene, otherwise we won't see the primitive
+    
+    glMultMatrixf(gTrans.data());
+    
+    /* Swapped out for matrix-based transformation
+    glRotatef(xRotationAngle, 1.0f, 0.0f, 0.0f); // Rotate our object around the x axis
+    glRotatef(yRotationAngle, 0.0f, 1.0f, 0.0f); // Rotate our object around the y axis
+    glTranslatef(0.0f, yLocation, 0.0f); // Translate our object along the y axis
+    glTranslatef(xLocation, 0.0f, 0.0f); // Translate our object along the x axis
+     */
+    
     renderMesh();
     glutSwapBuffers(); // Flush the OpenGL buffers to the window
+    
+    if (shadeToggle) {
+        if (shadeMode == SMOOTH) {
+            shadeMode = FLAT;
+            glShadeModel(GL_FLAT);
+        }
+        else {
+            shadeMode = SMOOTH;
+            glShadeModel(GL_SMOOTH);
+        }
+        shadeToggle = false;
+    }
+    if (fillToggle) {
+        if (fillMode == FILLED) {
+            fillMode = WIREFRAME;
+            glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+        }
+        else {
+            fillMode = FILLED;
+            glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+        }
+        fillToggle = false;
+    }
 }
 
 void renderToOldOpenGL(int argc, char *argv[]) {
@@ -232,19 +320,68 @@ void renderToOldOpenGL(int argc, char *argv[]) {
     glutIdleFunc (display);
     glutReshapeFunc(reshape); // Tell GLUT to use the method "reshape" for reshaping
     
+    glutKeyboardFunc(keyPressed); // Tell GLUT to use the method "keyPressed" for key presses
+    glutKeyboardUpFunc(keyUp); // Tell GLUT to use the method "keyUp" for key up events
+    glutSpecialFunc(specialKeyPressed);
+    
     glutMainLoop(); // Enter GLUT's main loop
 }
+
+//void specialkeyboard(int key, int x, int y)
+//{
+//    float _movestep = 0.1;
+//    const GLdouble *_matrix;
+//    glGetDoublev(GL_MODELVIEW_MATRIX,_matrix);
+//    switch(key)
+//    {
+//        case GLUT_KEY_LEFT:
+//        {
+//            glLoadIdentity();
+//            glTranslatef(0-_movestep ,0,0);
+//            glMultMatrixd(_matrix);
+//            _dragPosX -= 0-_movestep;
+//            break;
+//        }
+//        case GLUT_KEY_UP:
+//        {
+//            glLoadIdentity();
+//            glTranslatef(0,_movestep,0);
+//            glMultMatrixd(_matrix);
+//            _dragPosY += _movestep;
+//            break;
+//        }
+//        case GLUT_KEY_RIGHT:
+//        {
+//            glLoadIdentity();
+//            glTranslatef(_movestep ,0,0);
+//            glMultMatrixd(_matrix);
+//            _dragPosX += _movestep;
+//            break;
+//        }
+//        case GLUT_KEY_DOWN:
+//        {
+//            glLoadIdentity();
+//            glTranslatef(0,0-_movestep,0);
+//            glMultMatrixd(_matrix);
+//            _dragPosY -= 0-_movestep;
+//            break;
+//        }
+//        default: break;
+//    }
+//    //--refresh the model matrix and its inversed version
+//    getMatrix();
+//    //--redraw
+//    glutPostRedisplay();
+//}
 
 void renderToOpenGL(vector<RasterMesh> meshes) {
     // Shader sources
     const GLchar* vertexSource =
     "#version 150 core\n"
     "in vec3 position;"
-    "in vec3 color;"
-    "out vec3 Color;"
+    "in vec3 normal;"
     "uniform mat4 trans;"
     "void main() {"
-    "   Color = color;"
     "   gl_Position = trans * vec4(position, 1.0);"
     "}";
     const GLchar* fragmentSource =
@@ -259,6 +396,7 @@ void renderToOpenGL(vector<RasterMesh> meshes) {
         cerr << "GLFW cannot initialize" << endl;
         return;
     }
+    
     
     //Only version 3.2 and up
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);

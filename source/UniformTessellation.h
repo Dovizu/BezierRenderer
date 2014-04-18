@@ -14,19 +14,19 @@
 
 /* Reference:
  typedef struct {
-     MeshType type;
-     size_t numOfVertices;
-     size_t numOfIndices;
-     //for uniform tessellation
-     Vector *vertices;
-     int *indices;
-     //for adaptive tessellation
-     vector<Vector> *adaptiveVertices;
+ MeshType type;
+ size_t numOfVertices;
+ size_t numOfIndices;
+ //for uniform tessellation
+ Vector *vertices;
+ int *indices;
+ //for adaptive tessellation
+ vector<Vector> *adaptiveVertices;
  } Mesh;
-
+ 
  typedef struct {
-    size_t numberOfPatches;
-    Vector *controlPoints;
+ size_t numberOfPatches;
+ Vector *controlPoints;
  } BezierObject;
  */
 
@@ -41,6 +41,10 @@ private:
     Vector evaluateBezierPatch(const Vector *controlPoints,
                                const float &u,
                                const float &v);
+    Vector evaluateSurfaceNormal(const Vector *controlPoints,
+                                 const float &u,
+                                 const float &v);
+    Vector evaluateTangent(const Vector *ctrPts, const float &t);
 };
 
 #endif /* defined(__BezierSurfaceRenderer__UniformTessellation__) */
