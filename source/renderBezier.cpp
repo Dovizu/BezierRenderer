@@ -18,6 +18,8 @@ void renderToOpenGL(vector<RasterMesh> meshes);
 void renderToOldOpenGL(int argc, char *argv[]);
 
 vector<RasterMesh> rasterMeshes;
+vector<Matrix4f> transformations;
+
 bool keyStates[256] = {false}; // Create an array of boolean values of length 256 (0-255)
 
 bool shadeToggle = false;
@@ -29,7 +31,10 @@ bool gTransChanged = false;
 bool adaptive = false;
 
 //Global transformation
-Matrix4f gTrans = Matrix4f::Identity();
+//Matrix4f gTrans = Matrix4f::Identity();
+int currentObj = 0;
+#define gTrans transformations.at(currentObj)
+int menuHandle = -1;
 
 //Process command line options and kickstart tessellation and OpenGL
 int main(int argc, char *argv[]) {
@@ -97,8 +102,14 @@ int main(int argc, char *argv[]) {
             parser->parseFile(fileName, objects);
         }
         tessellator->tessellate(objects, meshes);
-        //render mesh openGL
+        
+        //rasterize meshes
         rasterizeMeshes(meshes, rasterMeshes);
+        //create transformation matrices
+        for (int i=0;i<rasterMeshes.size();i++) {
+            transformations.push_back(Matrix4f::Identity());
+        }
+        //render using OpenGL
         renderToOldOpenGL(argc, argv);
 //        renderToOpenGL(rasterMeshes);
     }
@@ -140,6 +151,19 @@ void rasterizeMeshes(vector<Mesh>& meshes, vector<RasterMesh>& rasters) {
     }
 }
 
+void menuItemPressed(int value) {
+    currentObj = value;
+}
+
+void createMenu() {
+    menuHandle = glutCreateMenu(menuItemPressed);
+    glutSetMenu(menuHandle);
+    for (int i=0; i<rasterMeshes.size(); i++) {
+        string entry = string("Object ") + to_string(i+1);
+        glutAddMenuEntry(entry.c_str(), i);
+    }
+}
+
 void specialKeyPressed(int key, int x, int y)
 {
     int mod;
@@ -149,7 +173,7 @@ void specialKeyPressed(int key, int x, int y)
             if (mod == GLUT_ACTIVE_SHIFT) {
                 gTrans = Transform3fAffine(Translation3f(0,0.09,0))*gTrans;
             } else {
-                gTrans = Transform3fAffine(AngleAxisf(-M_PI/128,Vector3f::UnitX()))*gTrans;
+                gTrans = gTrans*Transform3fAffine(AngleAxisf(-M_PI/128,Vector3f::UnitX())).matrix();
             }
             break;
         case GLUT_KEY_DOWN:
@@ -157,7 +181,7 @@ void specialKeyPressed(int key, int x, int y)
             if (mod == GLUT_ACTIVE_SHIFT) {
                 gTrans = Transform3fAffine(Translation3f(0,-0.09,0))*gTrans;
             } else {
-                gTrans = Transform3fAffine(AngleAxisf(M_PI/128,Vector3f::UnitX()))*gTrans;
+                gTrans = gTrans*Transform3fAffine(AngleAxisf(M_PI/128,Vector3f::UnitX())).matrix();
             }
             break;
         case GLUT_KEY_LEFT:
@@ -165,7 +189,7 @@ void specialKeyPressed(int key, int x, int y)
             if (mod == GLUT_ACTIVE_SHIFT) {
                 gTrans = Transform3fAffine(Translation3f(-0.09,0,0))*gTrans;
             } else {
-                gTrans = Transform3fAffine(AngleAxisf(-M_PI/128,Vector3f::UnitY()))*gTrans;
+                gTrans = gTrans*Transform3fAffine(AngleAxisf(-M_PI/128,Vector3f::UnitY())).matrix();
             }
             break;
         case GLUT_KEY_RIGHT:
@@ -173,7 +197,7 @@ void specialKeyPressed(int key, int x, int y)
             if (mod == GLUT_ACTIVE_SHIFT) {
                 gTrans = Transform3fAffine(Translation3f(0.09,0,0))*gTrans;
             } else {
-                gTrans = Transform3fAffine(AngleAxisf(M_PI/128,Vector3f::UnitY()))*gTrans;
+                gTrans = gTrans*Transform3fAffine(AngleAxisf(M_PI/128,Vector3f::UnitY())).matrix();
             }
             break;
     }
@@ -215,11 +239,10 @@ void reshape (int width, int height) {
     glMatrixMode(GL_MODELVIEW); // Switch back to the model view matrix, so that we can start drawing shapes correctly
 }
 
-void renderMesh() {
+void renderMesh(RasterMesh& rasterMesh) {
     GLenum drawingMode = adaptive ? GL_TRIANGLES : GL_QUADS;
     int increment = adaptive ? 3 : 6;
     
-    RasterMesh rasterMesh = rasterMeshes[0];
     for (int v = 0; v < rasterMesh.numOfIndices; v += increment) {
         glBegin(drawingMode);
         glNormal3f(rasterMesh.vertices[6*rasterMesh.indices[v]+3],
@@ -271,18 +294,29 @@ void display (void) {
     gluLookAt (0.0, 0.0, 5.0, //eyeX, eyeY, eyeZ
                0.0, 0.0, 0.0, //centerX, centerY, centerZ
                0.0, 1.0, 0.0); //upX, upY, upZ
+    
     glTranslatef(0.0f, 0.0f, -5.0f); // Push eveything 5 units back into the scene, otherwise we won't see the primitive
     
-    glMultMatrixf(gTrans.data());
+    for (int meshIdx=0; meshIdx<rasterMeshes.size(); meshIdx++) {
+        glPushMatrix();
+        
+        GLfloat white[] = {0.8f, 0.8f, 0.8f, 1.0f};
+        GLfloat cyan[] = {0.f, .8f, .8f, 1.f};
+        if (meshIdx == currentObj) {
+            glMaterialfv(GL_FRONT, GL_DIFFUSE, cyan);
+        }else {
+            glMaterialfv(GL_FRONT, GL_DIFFUSE, white);
+        }
+        glMaterialfv(GL_FRONT, GL_SPECULAR, white);
+        GLfloat shininess[] = {50};
+        glMaterialfv(GL_FRONT, GL_SHININESS, shininess);
+        
+        glMultMatrixf(transformations.at(meshIdx).data());
+        renderMesh(rasterMeshes.at(meshIdx));
+        
+        glPopMatrix();
+    }
     
-    /* Swapped out for matrix-based transformation
-    glRotatef(xRotationAngle, 1.0f, 0.0f, 0.0f); // Rotate our object around the x axis
-    glRotatef(yRotationAngle, 0.0f, 1.0f, 0.0f); // Rotate our object around the y axis
-    glTranslatef(0.0f, yLocation, 0.0f); // Translate our object along the y axis
-    glTranslatef(xLocation, 0.0f, 0.0f); // Translate our object along the x axis
-     */
-    
-    renderMesh();
     glutSwapBuffers(); // Flush the OpenGL buffers to the window
     
     if (shadeToggle) {
@@ -331,55 +365,11 @@ void renderToOldOpenGL(int argc, char *argv[]) {
     glutKeyboardUpFunc(keyUp); // Tell GLUT to use the method "keyUp" for key up events
     glutSpecialFunc(specialKeyPressed);
     
+    createMenu();
+    glutAttachMenu(GLUT_LEFT_BUTTON);
+    
     glutMainLoop(); // Enter GLUT's main loop
 }
-
-//void specialkeyboard(int key, int x, int y)
-//{
-//    float _movestep = 0.1;
-//    const GLdouble *_matrix;
-//    glGetDoublev(GL_MODELVIEW_MATRIX,_matrix);
-//    switch(key)
-//    {
-//        case GLUT_KEY_LEFT:
-//        {
-//            glLoadIdentity();
-//            glTranslatef(0-_movestep ,0,0);
-//            glMultMatrixd(_matrix);
-//            _dragPosX -= 0-_movestep;
-//            break;
-//        }
-//        case GLUT_KEY_UP:
-//        {
-//            glLoadIdentity();
-//            glTranslatef(0,_movestep,0);
-//            glMultMatrixd(_matrix);
-//            _dragPosY += _movestep;
-//            break;
-//        }
-//        case GLUT_KEY_RIGHT:
-//        {
-//            glLoadIdentity();
-//            glTranslatef(_movestep ,0,0);
-//            glMultMatrixd(_matrix);
-//            _dragPosX += _movestep;
-//            break;
-//        }
-//        case GLUT_KEY_DOWN:
-//        {
-//            glLoadIdentity();
-//            glTranslatef(0,0-_movestep,0);
-//            glMultMatrixd(_matrix);
-//            _dragPosY -= 0-_movestep;
-//            break;
-//        }
-//        default: break;
-//    }
-//    //--refresh the model matrix and its inversed version
-//    getMatrix();
-//    //--redraw
-//    glutPostRedisplay();
-//}
 
 void renderToOpenGL(vector<RasterMesh> meshes) {
     // Shader sources
