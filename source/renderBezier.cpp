@@ -63,8 +63,6 @@ int main(int argc, char *argv[]) {
     if ((!directoryName.empty() || !fileName.empty()) && param > 0.0) {
         unique_ptr<BEZParser> parser(new BEZParser());
         unique_ptr<Tessellation> tessellator;
-        vector<BezierObject> objects;
-        vector<Mesh> meshes;
         
         if (adaptive) {
             tessellator = unique_ptr<Tessellation>(new AdaptiveTessellation());
@@ -93,7 +91,25 @@ int main(int argc, char *argv[]) {
         else
             renderToOpenGL(argc, argv);
     }
+    
     return 0;
+}
+
+void quit() {
+    //cleanup
+    for (auto& mesh : rasterMeshes) {
+        delete[] mesh.vertices;
+        delete[] mesh.indices;
+    }
+    for (auto& mesh : meshes) {
+        //delete[] mesh.indices;
+        delete[] mesh.vertices;
+        delete[] mesh.adaptiveVertices;
+    }
+    for (auto& bezier : objects) {
+        delete[] bezier.controlPoints;
+    }
+    exit(0);
 }
 
 // Convert mesh Vector arrays to x-y-z arrays
@@ -206,7 +222,7 @@ void keyPressed (unsigned char key, int x, int y) {
             fillToggle = true;
             break;
         case 27: // Escape key to exit
-            exit(0);
+            quit();
             break;
         case '-': //zoom out
             gTrans = Transform3fAffine(Translation3f(0,0,-0.09))*gTrans;

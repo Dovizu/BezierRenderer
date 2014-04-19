@@ -38,6 +38,8 @@ void renderToOpenGL3(vector<RasterMesh>& meshes);
 void renderToOpenGL(int argc, char *argv[]);
 
 vector<RasterMesh> rasterMeshes;
+vector<BezierObject> objects;
+vector<Mesh> meshes;
 vector<Matrix4f> transformations;
 
 bool keyStates[256] = {false}; // Create an array of boolean values of length 256 (0-255)
