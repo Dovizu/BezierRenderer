@@ -315,12 +315,14 @@ void display (void) {
         
         GLfloat white[] = {0.8f, 0.8f, 0.8f, 1.0f};
         GLfloat cyan[] = {0.f, .8f, .8f, 1.f};
+        GLfloat magenta[] = {0.811f, 0.105f, 0.4627, 1.f};
+        GLfloat darkGreen[] = {0.35f, 0.505f, 0.549f, 1.f};
         GLfloat shininess[] = {80};
         
         if (meshIdx == currentObj) {
-            glMaterialfv(GL_FRONT, GL_DIFFUSE, cyan);
+            glMaterialfv(GL_FRONT, GL_DIFFUSE, magenta);
         }else {
-            glMaterialfv(GL_FRONT, GL_DIFFUSE, white);
+            glMaterialfv(GL_FRONT, GL_DIFFUSE, darkGreen);
         }
         glMaterialfv(GL_FRONT, GL_SPECULAR, white);
         

@@ -51,7 +51,7 @@ def load_obj_file(filename):
         #     v3[2] -= z
 
         s1 = v_to_s(v1) + v_to_s(v1) + v_to_s(v2) + v_to_s(v2) + '\n'
-        s2 = v_to_s(v3) + v_to_s(v3) + v_to_s(v4) + v_to_s(v4) + '\n'
+        s2 = v_to_s(v4) + v_to_s(v4) + v_to_s(v3) + v_to_s(v3) + '\n'
 
         out.write(s1)
         out.write(s1)
