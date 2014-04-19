@@ -1,36 +1,43 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-
   <head>
-    <meta charset='utf-8' />
-    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
-    <meta name="description" content="CS184 BezierRenderer : " />
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>CS184 BezierRenderer by Dovizu</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/respond.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="stylesheets/ie.css">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 
-    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
-
-    <title>CS184 BezierRenderer</title>
   </head>
-
   <body>
+      <div id="header">
+        <nav>
+          <li class="fork"><a href="https://github.com/Dovizu/BezierRenderer">View On GitHub</a></li>
+          <li class="downloads"><a href="https://github.com/Dovizu/BezierRenderer/zipball/master">ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/Dovizu/BezierRenderer/tarball/master">TAR</a></li>
+          <li class="title">DOWNLOADS</li>
+        </nav>
+      </div><!-- end header -->
 
-    <!-- HEADER -->
-    <div id="header_wrap" class="outer">
-        <header class="inner">
-          <a id="forkme_banner" href="https://github.com/Dovizu/BezierRenderer">View on GitHub</a>
+    <div class="wrapper">
 
-          <h1 id="project_title">CS184 BezierRenderer</h1>
-          <h2 id="project_tagline"></h2>
+      <section>
+        <div id="title">
+          <h1>CS184 BezierRenderer</h1>
+          <p></p>
+          <hr>
+          <span class="credits left">Project maintained by <a href="https://github.com/Dovizu">Dovizu</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
+        </div>
 
-            <section id="downloads">
-              <a class="zip_download_link" href="https://github.com/Dovizu/BezierRenderer/zipball/master">Download this project as a .zip file</a>
-              <a class="tar_download_link" href="https://github.com/Dovizu/BezierRenderer/tarball/master">Download this project as a tar.gz file</a>
-            </section>
-        </header>
-    </div>
-
-    <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer">
-      <section id="main_content" class="inner">
         <h1>
 <a name="project-identity" class="anchor" href="#project-identity"><span class="octicon octicon-link"></span></a>Project Identity</h1>
 
@@ -60,16 +67,6 @@
 
 <p><code>make</code></p>
 
-<h3>
-<a name="names" class="anchor" href="#credits"><span class="octicon octicon-link"></span></a>Credits</h3>
-
-<ul>
-<li>Pygames: obj parser</li>
-<li>obj2pez.py inspired by Alan Yao</li>
-<li>open.gl: custom shader</li>
-<li>lighthouse3d.com: some OpenGL skeleton code</li>
-</ul>
-
 <h1>
 <a name="demonstration" class="anchor" href="#demonstration"><span class="octicon octicon-link"></span></a>Demonstration</h1>
 
@@ -95,13 +92,11 @@
 <a name="core-transformation-shading-modes-and-fill-modes" class="anchor" href="#core-transformation-shading-modes-and-fill-modes"><span class="octicon octicon-link"></span></a>Core: Transformation, Shading Modes and Fill Modes</h3>
 
 <p><a href="https://www.youtube.com/watch?v=OGlHXdFZguo&amp;list=PLH8PbRYZm8EYLX0kipsOS2piibnhldCT6">YouTube Video</a></p>
-<iframe width="640" height="480" src="//www.youtube.com/embed/OGlHXdFZguo" frameborder="0" allowfullscreen></iframe>
 
 <h3>
 <a name="extra-multiple-objects-support" class="anchor" href="#extra-multiple-objects-support"><span class="octicon octicon-link"></span></a>Extra: Multiple Objects Support</h3>
 
 <p><a href="https://www.youtube.com/watch?v=neblYL_FWWI&amp;list=PLH8PbRYZm8EYLX0kipsOS2piibnhldCT6">YouTube Video</a></p>
-<iframe width="640" height="480" src="//www.youtube.com/embed/neblYL_FWWI" frameborder="0" allowfullscreen></iframe>
 
 <h3>
 <a name="extra-hidden-line-removal" class="anchor" href="#extra-hidden-line-removal"><span class="octicon octicon-link"></span></a>Extra: Hidden Line Removal</h3>
@@ -111,7 +106,6 @@
 <p><img src="https://raw.githubusercontent.com/Dovizu/BezierRenderer/master/examples/teapot_a_hlr.png" alt="teapot-a-hlr"></p>
 
 <p><a href="https://www.youtube.com/watch?v=dQNJti0gQCU&amp;list=PLH8PbRYZm8EYLX0kipsOS2piibnhldCT6">YouTubeVideo</a></p>
-<iframe width="640" height="480" src="//www.youtube.com/embed/dQNJti0gQCU" frameborder="0" allowfullscreen></iframe>
 
 <h3>
 <a name="extra-custom-shader-no-phong-shading" class="anchor" href="#extra-custom-shader-no-phong-shading"><span class="octicon octicon-link"></span></a>Extra: Custom Shader (No Phong Shading)</h3>
@@ -119,7 +113,6 @@
 <p><code>./renderBezier -f bezFiles/teapot.bez 0.01 -a --opengl3</code></p>
 
 <p><a href="https://www.youtube.com/watch?v=8337QsCNOSE&amp;list=PLH8PbRYZm8EYLX0kipsOS2piibnhldCT6">YouTube Video</a></p>
-<iframe width="640" height="480" src="//www.youtube.com/embed/8337QsCNOSE" frameborder="0" allowfullscreen></iframe>
 
 <h3>
 <a name="extra-convert-obj-to-bez-patches" class="anchor" href="#extra-convert-obj-to-bez-patches"><span class="octicon octicon-link"></span></a>Extra: Convert OBJ to BEZ Patches</h3>
@@ -219,17 +212,9 @@
 <h4>
 <a name="adaptivetessellation" class="anchor" href="#adaptivetessellation"><span class="octicon octicon-link"></span></a>AdaptiveTessellation</h4>
       </section>
-    </div>
 
-    <!-- FOOTER  -->
-    <div id="footer_wrap" class="outer">
-      <footer class="inner">
-        <p class="copyright">CS184 BezierRenderer maintained by <a href="https://github.com/Dovizu">Dovizu</a></p>
-        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
-      </footer>
     </div>
-
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
     
-
   </body>
 </html>
