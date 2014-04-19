@@ -21,7 +21,7 @@ void testAdaptive() {
     AdaptiveTessellation adaptive;
     vector<Mesh> meshes;
     adaptive.tessellate(objects, meshes);
-    Mesh mesh = meshes.at(0);
+//    Mesh mesh = meshes.at(0);
 }
 
 void testUniform() {

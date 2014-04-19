@@ -349,6 +349,9 @@
 		F196DF9218EFE88F00DB8DD2 /* UniformTessellation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UniformTessellation.h; sourceTree = "<group>"; };
 		F196DF9318EFF08100DB8DD2 /* Tessellation.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Tessellation.cpp; sourceTree = "<group>"; };
 		F196DF9418EFF08100DB8DD2 /* Tessellation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Tessellation.h; sourceTree = "<group>"; };
+		F19A76F81901EA6D000F6DAE /* gourd.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = gourd.obj; sourceTree = "<group>"; };
+		F19A76F91901EA6D000F6DAE /* obj2bez.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = obj2bez.py; sourceTree = "<group>"; };
+		F19A76FA1901EA6D000F6DAE /* shuttle.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = shuttle.obj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -364,6 +367,7 @@
 		F154BE3618EE8C5D0083974A = {
 			isa = PBXGroup;
 			children = (
+				F19A76F71901EA6D000F6DAE /* obj */,
 				F15261E918EFB8770012EA12 /* bezFiles */,
 				F154BFB518EE91BD0083974A /* .gitignore */,
 				F154BE4118EE8C890083974A /* Makefile */,
@@ -1042,6 +1046,16 @@
 				F196DF9318EFF08100DB8DD2 /* Tessellation.cpp */,
 			);
 			name = Tessellation;
+			sourceTree = "<group>";
+		};
+		F19A76F71901EA6D000F6DAE /* obj */ = {
+			isa = PBXGroup;
+			children = (
+				F19A76F81901EA6D000F6DAE /* gourd.obj */,
+				F19A76F91901EA6D000F6DAE /* obj2bez.py */,
+				F19A76FA1901EA6D000F6DAE /* shuttle.obj */,
+			);
+			path = obj;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

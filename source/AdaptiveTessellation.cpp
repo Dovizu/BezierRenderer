@@ -36,8 +36,8 @@ void AdaptiveTessellation::tessellate(vector<BezierObject>& bezierObjects,
             ParametricPoint C(1,1);
             ParametricPoint D(0,1);
 
-            evaluateAdaptiveTriangle(A,B,C, patchControlPoints, mesh);
-            evaluateAdaptiveTriangle(A,C,D, patchControlPoints, mesh);
+            evaluateAdaptiveTriangle(A,B,C, patchControlPoints, mesh, 0);
+            evaluateAdaptiveTriangle(A,C,D, patchControlPoints, mesh, 0);
         }
         //calculate indices (dummies, only used for modern shader pipeline)
         mesh.indices = new int[mesh.numOfIndices];
@@ -52,7 +52,8 @@ void AdaptiveTessellation::evaluateAdaptiveTriangle(ParametricPoint& A,
                                                     ParametricPoint& B,
                                                     ParametricPoint& C,
                                                     const Vector *ctrPts,
-                                                    Mesh& mesh)
+                                                    Mesh& mesh,
+                                                    int depth)
 {
     /*
     (v1)           (v2)
@@ -85,7 +86,7 @@ void AdaptiveTessellation::evaluateAdaptiveTriangle(ParametricPoint& A,
     e2 = abs((evaluateBezierPatch(ctrPts, e2pt)-(v1+v2)/2).norm()) > error;
     e3 = abs((evaluateBezierPatch(ctrPts, e3pt)-(v2+v3)/2).norm()) > error;
     unsigned int binary = e1 | e2 << 1 | e3 << 2;
-
+    if (depth>50) binary = 0b000; //no need for finer details, indistinguishable by eye
     if (binary == 0b000) {
         v1norm = evaluateSurfaceNormal(ctrPts, A);
         v2norm = evaluateSurfaceNormal(ctrPts, B);
@@ -94,37 +95,37 @@ void AdaptiveTessellation::evaluateAdaptiveTriangle(ParametricPoint& A,
     
     switch (binary) {
         case 0b001: //e1 not flat
-            evaluateAdaptiveTriangle(e1pt, B, A, ctrPts, mesh);
-            evaluateAdaptiveTriangle(C, B, e1pt, ctrPts, mesh);
+            evaluateAdaptiveTriangle(e1pt, B, A, ctrPts, mesh, depth+1);
+            evaluateAdaptiveTriangle(C, B, e1pt, ctrPts, mesh, depth+1);
             break;
         case 0b010: //e2 not flat
-            evaluateAdaptiveTriangle(C, e2pt, A, ctrPts, mesh);
-            evaluateAdaptiveTriangle(C, B, e2pt, ctrPts, mesh);
+            evaluateAdaptiveTriangle(C, e2pt, A, ctrPts, mesh, depth+1);
+            evaluateAdaptiveTriangle(C, B, e2pt, ctrPts, mesh, depth+1);
             break;
         case 0b100: //e3 not flat
-            evaluateAdaptiveTriangle(A, e3pt, B, ctrPts, mesh);
-            evaluateAdaptiveTriangle(C, e3pt, A, ctrPts, mesh);
+            evaluateAdaptiveTriangle(A, e3pt, B, ctrPts, mesh, depth+1);
+            evaluateAdaptiveTriangle(C, e3pt, A, ctrPts, mesh, depth+1);
             break;
         case 0b011: //e1 e2 not flat
-            evaluateAdaptiveTriangle(C, B, e2pt, ctrPts, mesh);
-            evaluateAdaptiveTriangle(C, e2pt, e1pt, ctrPts, mesh);
-            evaluateAdaptiveTriangle(e1pt, e2pt, A, ctrPts, mesh);
+            evaluateAdaptiveTriangle(C, B, e2pt, ctrPts, mesh, depth+1);
+            evaluateAdaptiveTriangle(C, e2pt, e1pt, ctrPts, mesh, depth+1);
+            evaluateAdaptiveTriangle(e1pt, e2pt, A, ctrPts, mesh, depth+1);
             break;
         case 0b110: //e2 e3 not flat
-            evaluateAdaptiveTriangle(C, e3pt, A, ctrPts, mesh);
-            evaluateAdaptiveTriangle(A, e3pt, e2pt, ctrPts, mesh);
-            evaluateAdaptiveTriangle(e2pt, e3pt, B, ctrPts, mesh);
+            evaluateAdaptiveTriangle(C, e3pt, A, ctrPts, mesh, depth+1);
+            evaluateAdaptiveTriangle(A, e3pt, e2pt, ctrPts, mesh, depth+1);
+            evaluateAdaptiveTriangle(e2pt, e3pt, B, ctrPts, mesh, depth+1);
             break;
         case 0b101: //e1 e3 not flat
-            evaluateAdaptiveTriangle(C, e3pt, e1pt, ctrPts, mesh);
-            evaluateAdaptiveTriangle(e1pt, e3pt, B, ctrPts, mesh);
-            evaluateAdaptiveTriangle(e1pt, B, A, ctrPts, mesh);
+            evaluateAdaptiveTriangle(C, e3pt, e1pt, ctrPts, mesh, depth+1);
+            evaluateAdaptiveTriangle(e1pt, e3pt, B, ctrPts, mesh, depth+1);
+            evaluateAdaptiveTriangle(e1pt, B, A, ctrPts, mesh, depth+1);
             break;
         case 0b111: //e1 e2 e3 not flat
-            evaluateAdaptiveTriangle(C, e3pt, e1pt, ctrPts, mesh);
-            evaluateAdaptiveTriangle(e3pt, B, e2pt, ctrPts, mesh);
-            evaluateAdaptiveTriangle(e1pt, e3pt, e2pt, ctrPts, mesh);
-            evaluateAdaptiveTriangle(e1pt, e2pt, A, ctrPts, mesh);
+            evaluateAdaptiveTriangle(C, e3pt, e1pt, ctrPts, mesh, depth+1);
+            evaluateAdaptiveTriangle(e3pt, B, e2pt, ctrPts, mesh, depth+1);
+            evaluateAdaptiveTriangle(e1pt, e3pt, e2pt, ctrPts, mesh, depth+1);
+            evaluateAdaptiveTriangle(e1pt, e2pt, A, ctrPts, mesh, depth+1);
             break;
         case 0b000: //all flat
             mesh.adaptiveVertices->push_back(v1);
