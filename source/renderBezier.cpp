@@ -327,7 +327,16 @@ void display (void) {
         glMaterialfv(GL_FRONT, GL_SHININESS, shininess);
         
         glMultMatrixf(transformations.at(meshIdx).data());
+        
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         renderMesh(rasterMeshes.at(meshIdx));
+        
+        glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
+        glEnable(GL_POLYGON_OFFSET_FILL);
+        glPolygonOffset(1.0,1.0);
+        //set_color(background);
+        renderMesh(rasterMeshes.at(meshIdx));
+        glDisable(GL_POLYGON_OFFSET_FILL);
         
         glPopMatrix();
     }
