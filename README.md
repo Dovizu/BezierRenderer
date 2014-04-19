@@ -16,6 +16,30 @@ cs61b-bw
 ###Compile Instruction
 `make`
 
+Demonstration
+====================
+
+###Core: Uniform Shading (Step size: 0.1)
+Flat vs Smooth Shading `./renderBezier -f bezFiles/teapot.bez 0.1` + `press s` + `press w`
+![teapot-u-flat](/examples/teapot_u_flat.png)
+![teapot-u-smooth](/examples/teapot_u_smooth.png)
+![teapot-u-wire](/examples/teapot_u_wire.png)
+
+###Core: Adaptive Shading (Error tolerance: 0.01)
+Flat vs Smooth Shading `./renderBezier -f bezFiles/teapot.bez 0.01 -a` + `press s` + `press w`
+![teapot-a-flat](/examples/teapot_a_flat.png)
+![teapot-a-smooth](/examples/teapot_a_smooth.png)
+![teapot-a-wire](/examples/teapot_a_wire.png)
+
+###Core: Transformation, Shading Modes and Fill Modes
+
+###Extra Feature: Convert OBJ to BEZ Patches
+`./renderBezier -f bezFiles/bunny.bez 0.1 -a`
+
+Note: some errors come from our [obj2bez.py](obj/obj2bez.py) converter.
+![bunny](/examples/bunny.png)
+
+###
 Directory Structure
 =====================
 - `build/`: temporary object files for linking (need to be created)
