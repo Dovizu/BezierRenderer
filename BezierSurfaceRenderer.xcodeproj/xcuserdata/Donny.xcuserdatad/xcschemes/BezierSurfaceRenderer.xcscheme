@@ -48,7 +48,27 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "-d bezFiles/ 0.01 -a"
+            argument = "-f bezFiles/gourd.bez 0.1 -a"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-f bezFiles/bunny.bez 0.01"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-f bezFiles/bunny.bez 0.1 -a"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-f bezFiles/shuttle.bez 0.1"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-f bezFiles/teapot.bez 0.01 -a"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-f bezFiles/teapot.bez 0.1"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument

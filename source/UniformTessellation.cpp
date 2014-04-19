@@ -59,7 +59,7 @@ void UniformTessellation::tessellate(vector<BezierObject>& bezierObjects, vector
                     indices[k+5] = p + (divs+1)*(j+0) + (i+1); //left top
                     k += 6;
                     numberOfIndicies+=6;
-                    /*
+                    /* for debugging
                      if (indices[k+0] > biggestIndex) {
                      biggestIndex = indices[k+0];
                      }
@@ -80,75 +80,4 @@ void UniformTessellation::tessellate(vector<BezierObject>& bezierObjects, vector
         meshes.push_back(mesh);
         //printf("Biggest Index: %d\n", biggestIndex);
     }
-}
-
-Vector UniformTessellation::evaluateBezierCurve(const Vector *ctrPts, const float &t) {
-    float b0 = (1 - t) * (1 - t) * (1 - t);
-    float b1 = 3 * t * (1 - t) * (1 - t);
-    float b2 = 3 * t * t * (1 - t);
-    float b3 = t * t * t;
-    return ctrPts[0] * b0 + ctrPts[1] * b1 + ctrPts[2] * b2 + ctrPts[3] * b3;
-}
-
-Vector UniformTessellation::evaluateBezierPatch(const Vector *controlPoints,
-                                                const float &u,
-                                                const float &v) {
-    Vector uCurve[4];
-    for (int i = 0; i < 4; ++i) uCurve[i] = evaluateBezierCurve(controlPoints + 4 * i, u);
-    return evaluateBezierCurve(uCurve, v);
-}
-
-Vector UniformTessellation::evaluateSurfaceNormal(const Vector *controlPoints,
-                                                  const float &u,
-                                                  const float &v)
-{
-    Vector partialU[4];
-    Vector uCurve[4];
-    
-    for (int i = 0; i < 4; ++i) {
-        partialU[i] = evaluateTangent(controlPoints + 4 * i, u);
-//        float newU = u;
-//        while (partialU[i].norm() == 0) {
-//            newU += 0.01;
-//            partialU[i] = evaluateTangent(controlPoints + 4 * i, newU);
-//        }
-//        if (partialU[i].norm() == 0) {
-//            partialU[i] = Vector(0.01, 0.01, 0.01)
-//        }
-    }
-    for (int i = 0; i < 4; ++i) uCurve[i] = evaluateBezierCurve(controlPoints + 4 * i, u);
-    
-    Vector VpartialU = evaluateBezierCurve(partialU, v);
-//    float newV = v;
-//    while (VpartialU.norm() == 0) {
-//        newV -= 0.1;
-//        VpartialU = evaluateBezierCurve(partialU, newV);
-//    }
-    Vector UpartialV = evaluateTangent(uCurve, v);
-//    float newV = v;
-//    while (UpartialV.norm() == 0) {
-//        newV -= 0.1;
-//        UpartialV = evaluateTangent(uCurve, newV);
-//    }
-    Vector cross = VpartialU.cross(UpartialV);
-    if (cross.norm() == 0) {
-        //break
-    }
-    return (VpartialU.cross(UpartialV)).normalized();
-}
-
-Vector UniformTessellation::evaluateTangent(const Vector *ctrPts, const float &t) {
-//    Vector ctrPts2[4];
-//    if ((ctrPts[0]-ctrPts[1]-ctrPts[2]-ctrPts[3]).norm()==0) {
-//        ctrPts2[0] = ctrPts[0]+Vector(-0.02,-0.02,-0.02);
-//        ctrPts2[1] = ctrPts[1]+Vector(-0.01,-0.01,-0.01);
-//        ctrPts2[2] = ctrPts[2]+Vector(0.01,0.01,0.01);
-//        ctrPts2[3] = ctrPts[3]+Vector(0.02,0.02,0.02);
-//        ctrPts = ctrPts2;
-//    }
-    float b0 = -3 * (1 - t) * (1 - t);
-    float b1 = 3 * (1 - t) * (1 - t) - 6 * t * (1 - t);
-    float b2 = 6 * t * (1 - t) - 3 * t * t;
-    float b3 = 3 * t * t;
-    return ctrPts[0] * b0 + ctrPts[1] * b1 + ctrPts[2] * b2 + ctrPts[3] * b3;
 }

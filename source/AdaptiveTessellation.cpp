@@ -14,7 +14,7 @@ void AdaptiveTessellation::tessellate(vector<BezierObject>& bezierObjects,
                 vector<Mesh>& meshes) {
     for (auto & object : bezierObjects) {
         Mesh mesh = {AdaptiveMesh, 0, 0, NULL, NULL, new vector<Vector>};
-        //calculate fucking Bezier patches, getting all patchy patchy
+        //calculate Bezier patches
         Vector *patchControlPoints;
         for (int currPatch=0; currPatch<object.numberOfPatches; ++currPatch) {
             patchControlPoints = object.controlPoints+currPatch*16;
@@ -35,10 +35,11 @@ void AdaptiveTessellation::tessellate(vector<BezierObject>& bezierObjects,
             ParametricPoint B(1,0);
             ParametricPoint C(1,1);
             ParametricPoint D(0,1);
+
             evaluateAdaptiveTriangle(A,B,C, patchControlPoints, mesh);
             evaluateAdaptiveTriangle(A,C,D, patchControlPoints, mesh);
         }
-        //calculate indices (dummies)
+        //calculate indices (dummies, only used for modern shader pipeline)
         mesh.indices = new int[mesh.numOfIndices];
         for (int index=0; index < mesh.numOfIndices; index++) {
             mesh.indices[index] = index;
@@ -47,9 +48,9 @@ void AdaptiveTessellation::tessellate(vector<BezierObject>& bezierObjects,
     }
 }
 
-void AdaptiveTessellation::evaluateAdaptiveTriangle(const ParametricPoint& A,
-                                                    const ParametricPoint& B,
-                                                    const ParametricPoint& C,
+void AdaptiveTessellation::evaluateAdaptiveTriangle(ParametricPoint& A,
+                                                    ParametricPoint& B,
+                                                    ParametricPoint& C,
                                                     const Vector *ctrPts,
                                                     Mesh& mesh)
 {
@@ -139,52 +140,4 @@ void AdaptiveTessellation::evaluateAdaptiveTriangle(const ParametricPoint& A,
             ASSERT(false, "AdaptiveTessellation encountered unknown value");
             break;
     }
-}
-
-Vector AdaptiveTessellation::evaluateBezierCurve(const Vector *ctrPts, const float &t) {
-    float b0 = (1 - t) * (1 - t) * (1 - t);
-    float b1 = 3 * t * (1 - t) * (1 - t);
-    float b2 = 3 * t * t * (1 - t);
-    float b3 = t * t * t;
-    return ctrPts[0] * b0 + ctrPts[1] * b1 + ctrPts[2] * b2 + ctrPts[3] * b3;
-}
-
-Vector AdaptiveTessellation::evaluateBezierPatch(const Vector *controlPoints,
-                                                const float &u,
-                                                const float &v) {
-    Vector uCurve[4];
-    for (int i = 0; i < 4; ++i) uCurve[i] = evaluateBezierCurve(controlPoints + 4 * i, u);
-    return evaluateBezierCurve(uCurve, v);
-}
-
-Vector AdaptiveTessellation::evaluateBezierPatch(const Vector *controlPoints,
-                                                 const ParametricPoint& UV) {
-    return evaluateBezierPatch(controlPoints, UV(0), UV(1));
-}
-
-
-Vector AdaptiveTessellation::evaluateSurfaceNormal(const Vector *controlPoints,
-                                                  const float &u,
-                                                  const float &v)
-{
-    Vector partialU[4];
-    Vector uCurve[4];
-    
-    for (int i = 0; i < 4; ++i) partialU[i] = evaluateTangent(controlPoints + 4 * i, u);
-    for (int i = 0; i < 4; ++i) uCurve[i] = evaluateBezierCurve(controlPoints + 4 * i, u);
-    
-    return (evaluateBezierCurve(partialU, v).cross(evaluateTangent(uCurve, v))).normalized();
-}
-
-Vector AdaptiveTessellation::evaluateTangent(const Vector *ctrPts, const float &t) {
-    float b0 = -3 * (1 - t) * (1 - t);
-    float b1 = 3 * (1 - t) * (1 - t) - 6 * t * (1 - t);
-    float b2 = 6 * t * (1 - t) - 3 * t * t;
-    float b3 = 3 * t * t;
-    return ctrPts[0] * b0 + ctrPts[1] * b1 + ctrPts[2] * b2 + ctrPts[3] * b3;
-}
-
-Vector AdaptiveTessellation::evaluateSurfaceNormal(const Vector *controlPoints,
-                                                   const ParametricPoint& UV) {
-    return evaluateSurfaceNormal(controlPoints, UV(0), UV(1));
 }

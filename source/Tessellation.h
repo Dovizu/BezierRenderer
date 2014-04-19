@@ -12,6 +12,7 @@
 #include "utilities.h"
 #include "BEZParser.h"
 
+typedef Array2f ParametricPoint;
 typedef enum {
     UniformMesh,
     AdaptiveMesh
@@ -37,6 +38,20 @@ public:
     void setErrorRate(float e);
     virtual void tessellate(vector<BezierObject>& bezierObjects,
                             vector<Mesh>& meshes) = 0;
+protected:
+    Vector evaluateTangent(const Vector *ctrPts, const float &t);
+    Vector evaluateSurfaceNormal(const Vector *controlPoints,
+                                 const ParametricPoint& UV);
+    Vector evaluateSurfaceNormal(const Vector *controlPoints,
+                                 const float &u,
+                                 const float &v);
+    Vector evaluateBezierCurve(const Vector *ctrPts, const float &t);
+    Vector evaluateBezierPatch(const Vector *controlPoints,
+                               const float &u,
+                               const float &v);
+    Vector evaluateBezierPatch(const Vector *controlPoints,
+                               const ParametricPoint& UV);
+    
 };
 
 

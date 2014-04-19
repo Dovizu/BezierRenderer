@@ -39,24 +39,11 @@ public:
     void tessellate(vector<BezierObject>& bezierObjects,
                     vector<Mesh>& meshes);
 private:
-    Vector evaluateBezierCurve(const Vector *ctrPts, const float &t);
-    Vector evaluateBezierPatch(const Vector *controlPoints,
-                               const float &u,
-                               const float &v);
-    Vector evaluateBezierPatch(const Vector *controlPoints,
-                               const ParametricPoint& UV);
-    void evaluateAdaptiveTriangle(const ParametricPoint& A,
-                                  const ParametricPoint& B,
-                                  const ParametricPoint& C,
+    void evaluateAdaptiveTriangle(ParametricPoint& A,
+                                  ParametricPoint& B,
+                                  ParametricPoint& C,
                                   const Vector *ctrPts,
-                                  Mesh& mesh);
-    Vector evaluateSurfaceNormal(const Vector *controlPoints,
-                                 const float &u,
-                                 const float &v);
-    Vector evaluateTangent(const Vector *ctrPts, const float &t);
-    Vector evaluateSurfaceNormal(const Vector *controlPoints,
-                                                       const ParametricPoint& UV);
-    
+                                  Mesh& mesh);    
 };
 
 #endif /* defined(__BezierSurfaceRenderer__AdaptiveTessellation__) */
