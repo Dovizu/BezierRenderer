@@ -334,6 +334,7 @@ void display (void) {
         
         glMultMatrixf(transformations.at(meshIdx).data());
         
+        //Hidden Line Mode Toggle
         if (hiddenLineToggle) {
             if (hiddenLineMode == HL_ON)
                 hiddenLineMode = HL_OFF;
@@ -344,8 +345,7 @@ void display (void) {
         
         if (hiddenLineMode == HL_OFF) {
             renderMesh(rasterMeshes.at(meshIdx));
-        }
-        else {
+        } else {
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
             renderMesh(rasterMeshes.at(meshIdx));
             
