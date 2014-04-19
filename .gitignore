@@ -1,8 +1,4 @@
 *.o
-*.bmp
-*.jpg
-*.jpeg
-*.png
 /renderBezier
 
 .DS_Store
