@@ -1,0 +1,191 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>CS184 BezierRenderer by Dovizu</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/respond.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="stylesheets/ie.css">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+      <div id="header">
+        <nav>
+          <li class="fork"><a href="https://github.com/Dovizu/BezierRenderer">View On GitHub</a></li>
+          <li class="downloads"><a href="https://github.com/Dovizu/BezierRenderer/zipball/master">ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/Dovizu/BezierRenderer/tarball/master">TAR</a></li>
+          <li class="title">DOWNLOADS</li>
+        </nav>
+      </div><!-- end header -->
+
+    <div class="wrapper">
+
+      <section>
+        <div id="title">
+          <h1>CS184 BezierRenderer</h1>
+          <p></p>
+          <hr>
+          <span class="credits left">Project maintained by <a href="https://github.com/Dovizu">Dovizu</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
+        </div>
+
+        <h1>
+<a name="project-identity" class="anchor" href="#project-identity"><span class="octicon octicon-link"></span></a>Project Identity</h1>
+
+<h3>
+<a name="names" class="anchor" href="#names"><span class="octicon octicon-link"></span></a>Names</h3>
+
+<ul>
+<li>Leo Colobong</li>
+<li>Donny Reynolds</li>
+</ul><h3>
+<a name="platform" class="anchor" href="#platform"><span class="octicon octicon-link"></span></a>Platform</h3>
+
+<p><code>OS X</code> (Orchard Macs)</p>
+
+<h3>
+<a name="source-location" class="anchor" href="#source-location"><span class="octicon octicon-link"></span></a>Source Location</h3>
+
+<p><code>./</code></p>
+
+<h3>
+<a name="submitted-by" class="anchor" href="#submitted-by"><span class="octicon octicon-link"></span></a>Submitted by</h3>
+
+<p>cs61b-bw</p>
+
+<h3>
+<a name="compile-instruction" class="anchor" href="#compile-instruction"><span class="octicon octicon-link"></span></a>Compile Instruction</h3>
+
+<p><code>make</code></p>
+
+<h1>
+<a name="demonstration" class="anchor" href="#demonstration"><span class="octicon octicon-link"></span></a>Demonstration</h1>
+
+<h3>
+<a name="core-uniform-shading-step-size-01" class="anchor" href="#core-uniform-shading-step-size-01"><span class="octicon octicon-link"></span></a>Core: Uniform Shading (Step size: 0.1)</h3>
+
+<p>Flat vs Smooth Shading <code>./renderBezier -f bezFiles/teapot.bez 0.1</code> + <code>press s</code> + <code>press w</code>
+<img src="/examples/teapot_u_flat.png" alt="teapot-u-flat"><img src="/examples/teapot_u_smooth.png" alt="teapot-u-smooth"><img src="/examples/teapot_u_wire.png" alt="teapot-u-wire"></p>
+
+<h3>
+<a name="core-adaptive-shading-error-tolerance-001" class="anchor" href="#core-adaptive-shading-error-tolerance-001"><span class="octicon octicon-link"></span></a>Core: Adaptive Shading (Error tolerance: 0.01)</h3>
+
+<p>Flat vs Smooth Shading <code>./renderBezier -f bezFiles/teapot.bez 0.01 -a</code> + <code>press s</code> + <code>press w</code>
+<img src="/examples/teapot_a_flat.png" alt="teapot-a-flat"><img src="/examples/teapot_a_smooth.png" alt="teapot-a-smooth"><img src="/examples/teapot_a_wire.png" alt="teapot-a-wire"></p>
+
+<h3>
+<a name="core-transformation-shading-modes-and-fill-modes" class="anchor" href="#core-transformation-shading-modes-and-fill-modes"><span class="octicon octicon-link"></span></a>Core: Transformation, Shading Modes and Fill Modes</h3>
+
+<h3>
+<a name="extra-feature-convert-obj-to-bez-patches" class="anchor" href="#extra-feature-convert-obj-to-bez-patches"><span class="octicon octicon-link"></span></a>Extra Feature: Convert OBJ to BEZ Patches</h3>
+
+<p><code>./renderBezier -f bezFiles/bunny.bez 0.1 -a</code></p>
+
+<p>Note: some errors come from our <a href="obj/obj2bez.py">obj2bez.py</a> converter.
+<img src="/examples/bunny.png" alt="bunny"></p>
+
+<h1>
+<a name="directory-structure" class="anchor" href="#directory-structure"><span class="octicon octicon-link"></span></a>Directory Structure</h1>
+
+<ul>
+<li>
+<code>build/</code>: temporary object files for linking (need to be created)</li>
+<li>
+<code>libraries/</code>: external libraries</li>
+<li>
+<code>source/</code>: source code</li>
+<li><code>Makefile</code></li>
+<li><code>.gitignore</code></li>
+<li>
+<code>BezierSurfaceRenderer.xcodeproj</code>: XCode project settings</li>
+<li>
+<code>bezFiles/</code>: default bez files for testing</li>
+<li>
+<code>examples/</code>: submitted examples</li>
+<li>
+<code>obj/</code>: obj2bez.py parser and other obj files</li>
+</ul><h1>
+<a name="command-line-usage" class="anchor" href="#command-line-usage"><span class="octicon octicon-link"></span></a>Command Line Usage</h1>
+
+<p><code>./renderBezier [-f path/To/File.bez | -d path/to/dir/] stepSize|epsilon [-a] [--opengl3]</code></p>
+
+<h2>
+<a name="parameters" class="anchor" href="#parameters"><span class="octicon octicon-link"></span></a>Parameters</h2>
+
+<p><code>-f path/To/File.bez</code>: renders a single Bezier file (relative), the file must end in <code>.bez</code></p>
+
+<p><code>-d path/to/dir/</code>: renders all the <code>.bez</code> files in the specified directory, the trailing <code>/</code> is required</p>
+
+<p><code>-a</code>: if <code>-a</code> is specified, adaptive tessellation will be used, otherwise uniform tessellation will be used</p>
+
+<p><code>--opengl3</code>: enables our incomplete extra credit modern OpenGL 3.2+ pipeline, no Phong shading is implemented, but all transformations work correctly</p>
+
+<h1>
+<a name="gui-usage" class="anchor" href="#gui-usage"><span class="octicon octicon-link"></span></a>GUI Usage</h1>
+
+<h2>
+<a name="drawing-control" class="anchor" href="#drawing-control"><span class="octicon octicon-link"></span></a>Drawing Control</h2>
+
+<p><code>w</code>: press <code>w</code> to toggle between Wireframe and Filled drawing mode</p>
+
+<p><code>s</code>: press <code>s</code> to toggle between Smooth shading and Flat shading</p>
+
+<p><code>h</code>: press <code>h</code> to toggle between Hidden Line Removal mode and regular mode</p>
+
+<p><code>ESC</code>: press <code>ESC</code> to exit</p>
+
+<h2>
+<a name="transformations" class="anchor" href="#transformations"><span class="octicon octicon-link"></span></a>Transformations</h2>
+
+<p><code>+/-</code>: press <code>+/-</code> to zoom in/out</p>
+
+<p><code>UP/DOWN/LEFT/RIGHT</code>: translate</p>
+
+<p><code>SHIFT + UP/DOWN/LEFT/RIGHT</code>: rotate</p>
+
+<p><code>Left Mouse Click</code>: open up a menu to choose which object to transform, selected object will be highlighted</p>
+
+<h1>
+<a name="documentation" class="anchor" href="#documentation"><span class="octicon octicon-link"></span></a>Documentation</h1>
+
+<h2>
+<a name="external-libraries" class="anchor" href="#external-libraries"><span class="octicon octicon-link"></span></a>External Libraries</h2>
+
+<ul>
+<li>Eigen</li>
+<li>GLFW (<a href="http://www.glfw.org/docs/latest/pages.html">Doc</a>)</li>
+<li>GLEW (<a href="http://glew.sourceforge.net/install.html">Doc</a>)</li>
+<li>GLUT (<a href="http://www.opengl.org/resources/libraries/glut/">Doc</a>)</li>
+<li>OpenGL</li>
+</ul><h2>
+<a name="main-classes" class="anchor" href="#main-classes"><span class="octicon octicon-link"></span></a>Main Classes</h2>
+
+<h3>
+<a name="bezparser" class="anchor" href="#bezparser"><span class="octicon octicon-link"></span></a>BEZParser</h3>
+
+<p>Parses BEZ files containing patch data</p>
+
+<h3>
+<a name="tessellation" class="anchor" href="#tessellation"><span class="octicon octicon-link"></span></a>Tessellation</h3>
+
+<h4>
+<a name="uniformtessellation" class="anchor" href="#uniformtessellation"><span class="octicon octicon-link"></span></a>UniformTessellation</h4>
+
+<h4>
+<a name="adaptivetessellation" class="anchor" href="#adaptivetessellation"><span class="octicon octicon-link"></span></a>AdaptiveTessellation</h4>
+      </section>
+
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>
