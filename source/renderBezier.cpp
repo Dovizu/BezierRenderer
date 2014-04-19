@@ -95,23 +95,6 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
-void quit() {
-    //cleanup
-    for (auto& mesh : rasterMeshes) {
-        delete[] mesh.vertices;
-        delete[] mesh.indices;
-    }
-    for (auto& mesh : meshes) {
-        //delete[] mesh.indices;
-        delete[] mesh.vertices;
-        delete[] mesh.adaptiveVertices;
-    }
-    for (auto& bezier : objects) {
-        delete[] bezier.controlPoints;
-    }
-    exit(0);
-}
-
 // Convert mesh Vector arrays to x-y-z arrays
 void rasterizeMeshes(vector<Mesh>& meshes, vector<RasterMesh>& rasters) {
     for (auto & mesh : meshes) {
@@ -222,7 +205,7 @@ void keyPressed (unsigned char key, int x, int y) {
             fillToggle = true;
             break;
         case 27: // Escape key to exit
-            quit();
+            exit(0);
             break;
         case '-': //zoom out
             gTrans = Transform3fAffine(Translation3f(0,0,-0.09))*gTrans;
