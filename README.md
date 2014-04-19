@@ -38,14 +38,22 @@ Flat vs Smooth Shading
 ![teapot-a-wire](https://raw.githubusercontent.com/Dovizu/BezierRenderer/master/examples/teapot_a_wire.png)
 
 ###Core: Transformation, Shading Modes and Fill Modes
+[YouTube Video](https://www.youtube.com/watch?v=OGlHXdFZguo&list=PLH8PbRYZm8EYLX0kipsOS2piibnhldCT6)
 
 ###Extra: Multiple Objects Support
+[YouTube Video](https://www.youtube.com/watch?v=neblYL_FWWI&list=PLH8PbRYZm8EYLX0kipsOS2piibnhldCT6)
 
 ###Extra: Hidden Line Removal
 `./renderBezier -f bezFiles/teapot.bez 0.01 -a` + `press h`
+
 ![teapot-a-hlr](https://raw.githubusercontent.com/Dovizu/BezierRenderer/master/examples/teapot_a_hlr.png)
 
-###Extra: Custom Shader
+[YouTubeVideo](https://www.youtube.com/watch?v=dQNJti0gQCU&list=PLH8PbRYZm8EYLX0kipsOS2piibnhldCT6)
+
+###Extra: Custom Shader (No Phong Shading)
+`./renderBezier -f bezFiles/teapot.bez 0.01 -a --opengl3`
+
+[YouTube Video](https://www.youtube.com/watch?v=8337QsCNOSE&list=PLH8PbRYZm8EYLX0kipsOS2piibnhldCT6)
 
 ###Extra: Convert OBJ to BEZ Patches
 `./renderBezier -f bezFiles/bunny.bez 0.1 -a`
