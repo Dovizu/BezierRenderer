@@ -204,6 +204,9 @@ void keyPressed (unsigned char key, int x, int y) {
         case 'w': //toggle between FILLED and WIREFRAME drawing
             fillToggle = true;
             break;
+        case 'h': //toggle between Hidden Line Mode ON or OFF
+            hiddenLineToggle = true;
+            break;
         case 27: // Escape key to exit
             exit(0);
             break;
@@ -314,6 +317,7 @@ void display (void) {
         glPushMatrix();
         
         GLfloat white[] = {0.8f, 0.8f, 0.8f, 1.0f};
+        GLfloat black[] = {0.0f, 0.0f, 0.0f, 1.0f};
         GLfloat cyan[] = {0.f, .8f, .8f, 1.f};
         GLfloat magenta[] = {0.811f, 0.105f, 0.4627, 1.f};
         GLfloat darkGreen[] = {0.35f, 0.505f, 0.549f, 1.f};
@@ -330,15 +334,29 @@ void display (void) {
         
         glMultMatrixf(transformations.at(meshIdx).data());
         
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        renderMesh(rasterMeshes.at(meshIdx));
+        if (hiddenLineToggle) {
+            if (hiddenLineMode == HL_ON)
+                hiddenLineMode = HL_OFF;
+            else
+                hiddenLineMode = HL_ON;
+            hiddenLineToggle = false;
+        }
         
-        glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
-        glEnable(GL_POLYGON_OFFSET_FILL);
-        glPolygonOffset(1.0,1.0);
-        //set_color(background);
-        renderMesh(rasterMeshes.at(meshIdx));
-        glDisable(GL_POLYGON_OFFSET_FILL);
+        if (hiddenLineMode == HL_OFF) {
+            renderMesh(rasterMeshes.at(meshIdx));
+        }
+        else {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+            renderMesh(rasterMeshes.at(meshIdx));
+            
+            glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
+            glEnable(GL_POLYGON_OFFSET_FILL);
+            glPolygonOffset(1.0,1.0);
+            glMaterialfv(GL_FRONT, GL_DIFFUSE, black);
+            
+            renderMesh(rasterMeshes.at(meshIdx));
+            glDisable(GL_POLYGON_OFFSET_FILL);
+        }
         
         glPopMatrix();
     }

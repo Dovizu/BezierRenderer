@@ -33,6 +33,11 @@ typedef enum {
     WIREFRAME
 } FillMode;
 
+typedef enum {
+    HL_ON,
+    HL_OFF
+} HiddenLineMode;
+
 void rasterizeMeshes(vector<Mesh>& meshes, vector<RasterMesh>& rasters);
 void renderToOpenGL3(vector<RasterMesh>& meshes);
 void renderToOpenGL(int argc, char *argv[]);
@@ -48,6 +53,8 @@ bool shadeToggle = false;
 ShadeMode shadeMode = SMOOTH; //enum SMOOTH or FLAT
 bool fillToggle = false;
 FillMode fillMode = FILLED; //enum FILLED or WIREFRAME
+bool hiddenLineToggle = false;
+HiddenLineMode hiddenLineMode = HL_OFF;
 bool gTransChanged = false;
 bool adaptive = false;
 bool opengl3 = false;
