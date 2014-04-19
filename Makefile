@@ -12,7 +12,7 @@ GLEW_COMP = -I$(LIB)/GLEW/include -DGLEW_STATIC
 GLEW_LINK = -L$(LIB)/GLEW/lib -lGLEW
 
 ifeq ($(shell sw_vers 2>/dev/null | grep Mac | awk '{ print $$2}'),Mac)
-    CC = clang++ -std=c++11 -stdlib=libc++
+    CC = clang++ -std=c++11 -stdlib=libc++ -O3
 	CFLAGS = -g -c -Wall -Wno-deprecated $(EIGEN) $(GLFW_COMP) $(GLEW_COMP) $(DEBUG)
 	LFLAGS = -Wall $(GLFW_LINK) $(GLEW_LINK) -framework OpenGL -framework GLUT
 else
