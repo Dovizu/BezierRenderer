@@ -293,6 +293,8 @@ void renderMesh(RasterMesh& rasterMesh) {
                        rasterMesh.vertices[6*rasterMesh.indices[v+5]+1],
                        rasterMesh.vertices[6*rasterMesh.indices[v+5]+2]);
         }
+//        chrono::milliseconds timespan(1); // or whatever
+//        this_thread::sleep_for(timespan);
         glEnd();
     }
 }
